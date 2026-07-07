@@ -18,6 +18,8 @@ model User {
   streakDays   Int       @default(0)
   lastActiveAt DateTime?
   createdAt    DateTime  @default(now())
+  cohortId     String?
+  cohort       Cohort?   @relation(fields: [cohortId], references: [id])
 
   gameSessions     GameSession[]
   masteryScores    MasteryScore[]
@@ -29,6 +31,8 @@ model User {
   testAttempts     TestAttempt[]
   aiInterviews     AiInterview[]
   createdTests     AssessmentTest[] @relation("CreatedTests")
+  friendRequests   Friendship[]     @relation("FriendRequests")
+  friendOf         Friendship[]     @relation("FriendOf")
 }
 
 enum Role {
@@ -425,6 +429,7 @@ model CodingProblem {
   memoryLimitMb     Int                  @default(256)
   source            String?
   sourceUrl         String? // attribution link (e.g. A2Z sheet item)
+  companies         String[]             @default([]) // company slugs this problem is tagged for (e.g. ["amazon","microsoft"])
   verified          Boolean              @default(false) // true once reference solution passes all test cases
   createdAt         DateTime             @default(now())
 
@@ -474,6 +479,7 @@ model AssessmentTest {
 
   sections TestSection[]
   attempts TestAttempt[]
+  contest  Contest?
 }
 
 model TestSection {
@@ -569,6 +575,7 @@ model AiInterview {
   rubricScores Json? // { technical, communication, structure, problemSolving, roleFit } 0–5 each
   summary      String?
   proctoringSummary Json? // face-presence event counts from the video interview — signal, not verdict
+  deliverySignals   Json? // speech-delivery cues (avgWpm, totalFillers, per-answer) — informational, not scored
 
   turns AiInterviewTurn[]
 }
@@ -583,6 +590,53 @@ model AiInterviewTurn {
   turnScore   Float?
   feedback    String?
   order       Int
+  isFollowup  Boolean             @default(false) // interviewer probe on the previous answer (doesn't consume the question budget)
 
   @@index([interviewId, order])
+}
+
+// ===== SOCIAL & CONTESTS (Pillar D) =====
+
+model Cohort {
+  id        String   @id @default(uuid())
+  name      String // "PSG Tech — CSE 2026"
+  slug      String   @unique
+  joinCode  String   @unique // students join with this code
+  createdAt DateTime @default(now())
+
+  members  User[]
+  contests Contest[]
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+}
+
+model Friendship {
+  id          String       @id @default(uuid())
+  requesterId String
+  addresseeId String
+  status      FriendStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  requester   User         @relation("FriendRequests", fields: [requesterId], references: [id])
+  addressee   User         @relation("FriendOf", fields: [addresseeId], references: [id])
+
+  @@unique([requesterId, addresseeId])
+  @@index([addresseeId, status])
+}
+
+model Contest {
+  id          String         @id @default(uuid())
+  title       String
+  slug        String         @unique
+  description String?
+  testId      String         @unique
+  test        AssessmentTest @relation(fields: [testId], references: [id])
+  startsAt    DateTime
+  endsAt      DateTime
+  cohortId    String? // null = open to everyone; set = cohort-only
+  cohort      Cohort?        @relation(fields: [cohortId], references: [id])
+  settledAt   DateTime? // placement XP awarded once after endsAt
+  createdAt   DateTime       @default(now())
 }

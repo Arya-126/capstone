@@ -152,7 +152,8 @@ router.get('/manage', ...adminOnly, async (_req: AuthRequest, res: Response) => 
 router.get('/available', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const tests = await prisma.assessmentTest.findMany({
-      where: { status: 'PUBLISHED' },
+      // contest-backed tests are surfaced only in the Contests hub, not here
+      where: { status: 'PUBLISHED', contest: { is: null } },
       select: {
         id: true,
         title: true,

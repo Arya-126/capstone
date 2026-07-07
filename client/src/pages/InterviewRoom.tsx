@@ -16,6 +16,7 @@ interface Turn {
   order: number;
   role: 'INTERVIEWER' | 'CANDIDATE';
   content: string;
+  isFollowup?: boolean;
 }
 
 interface Interview {
@@ -68,6 +69,30 @@ export const InterviewRoom: React.FC<{
   }, [interview]);
   const submittingRef = useRef(false);
 
+  // ---- code-in-interview pad ----
+  const [showCode, setShowCode] = useState(false);
+  const [codeLang, setCodeLang] = useState('python');
+  const [codeSrc, setCodeSrc] = useState('');
+  const [codeStdin, setCodeStdin] = useState('');
+  const [codeOut, setCodeOut] = useState<{ status: string; stdout: string | null; stderr: string | null; compileOutput: string | null } | null>(null);
+  const [codeBusy, setCodeBusy] = useState(false);
+
+  // ---- speech-delivery signals (voice answers only; informational) ----
+  const deliveryRef = useRef<{ wpm: number; words: number; durationSec: number; fillers: number }[]>([]);
+  const listenStartRef = useRef<number>(0);
+  const FILLER_RE = /\b(um|uh|er|like|you know|basically|actually|literally|i mean)\b/g;
+  const captureDelivery = (text: string) => {
+    const durationSec = Math.max(1, (Date.now() - listenStartRef.current) / 1000);
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    if (words === 0) return;
+    deliveryRef.current.push({
+      wpm: Math.round(words / (durationSec / 60)),
+      words,
+      durationSec: Math.round(durationSec),
+      fillers: (text.toLowerCase().match(FILLER_RE) || []).length,
+    });
+  };
+
   // ---- shared camera (same stream as proctoring / self-view) ----
   const inRoom = phase === 'room';
   const { stream, status: cameraStatus } = useCameraStream(inRoom);
@@ -106,9 +131,13 @@ export const InterviewRoom: React.FC<{
     setListening(true);
     setAvatarState('listening');
     setInterim('');
+    listenStartRef.current = Date.now();
     defaultStt.start({
       onInterim: setInterim,
-      onFinal: (text) => submitAnswer(text),
+      onFinal: (text) => {
+        captureDelivery(text); // pace/filler cues from this spoken answer
+        submitAnswer(text);
+      },
       onEnd: () => {
         setListening(false);
         setAvatarState((s) => (s === 'listening' ? 'idle' : s));
@@ -176,6 +205,22 @@ export const InterviewRoom: React.FC<{
       } catch {
         /* signal only */
       }
+      // speech-delivery signals (voice answers only) — informational
+      const ans = deliveryRef.current;
+      if (ans.length > 0) {
+        const totalFillers = ans.reduce((s, a) => s + a.fillers, 0);
+        const avgWpm = Math.round(ans.reduce((s, a) => s + a.wpm, 0) / ans.length);
+        try {
+          await apiClient.post(`/ai-interview/${interviewId}/delivery`, {
+            avgWpm,
+            totalFillers,
+            voiceAnswers: ans.length,
+            answers: ans,
+          });
+        } catch {
+          /* signal only */
+        }
+      }
       if (callFinish) {
         try {
           await apiClient.post(`/ai-interview/${interviewId}/finish`, {});
@@ -228,6 +273,30 @@ export const InterviewRoom: React.FC<{
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   const sttAvailable = defaultStt.available();
+
+  // ---- code pad actions ----
+  const runScratch = async () => {
+    if (!codeSrc.trim()) return;
+    setCodeBusy(true);
+    setCodeOut(null);
+    try {
+      const r = await apiClient.post<{ status: string; stdout: string | null; stderr: string | null; compileOutput: string | null }>(
+        '/code/scratch',
+        { language: codeLang, source: codeSrc, stdin: codeStdin }
+      );
+      setCodeOut(r);
+    } catch {
+      setCodeOut({ status: 'Runner unavailable', stdout: null, stderr: 'Could not run — is the sandbox running?', compileOutput: null });
+    } finally {
+      setCodeBusy(false);
+    }
+  };
+  const sendCodeAsAnswer = () => {
+    if (!codeSrc.trim()) return;
+    const content = `Here is my solution (${codeLang}):\n\n\`\`\`${codeLang}\n${codeSrc}\n\`\`\``;
+    setShowCode(false);
+    submitAnswer(content);
+  };
 
   // ================= consent =================
   if (phase === 'consent') {
@@ -305,9 +374,66 @@ export const InterviewRoom: React.FC<{
             <h2 className="font-black text-sm mb-3">Transcript</h2>
             {(interview?.turns || []).map((t) => (
               <div key={t.order} className={`text-xs mb-2 p-2 rounded ${t.role === 'CANDIDATE' ? 'bg-indigo-900/60' : 'bg-slate-800'}`}>
-                <b>{t.role === 'CANDIDATE' ? 'You' : 'Interviewer'}:</b> {t.content}
+                <b>{t.role === 'CANDIDATE' ? 'You' : 'Interviewer'}:</b>
+                {t.isFollowup && <span className="ml-1 text-[9px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-black uppercase">follow-up</span>}{' '}
+                {t.content}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* code-in-interview pad */}
+        {showCode && (
+          <div className="absolute left-0 top-0 bottom-0 w-[26rem] max-w-[90vw] bg-slate-900/97 text-white p-4 overflow-y-auto flex flex-col">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="font-black text-sm">💻 Code pad</h2>
+              <select
+                value={codeLang}
+                onChange={(e) => setCodeLang(e.target.value)}
+                className="bg-slate-800 text-white text-xs rounded px-2 py-1"
+              >
+                {['python', 'javascript', 'cpp', 'java'].map((l) => (
+                  <option key={l} value={l}>{l}</option>
+                ))}
+              </select>
+            </div>
+            <textarea
+              value={codeSrc}
+              onChange={(e) => setCodeSrc(e.target.value)}
+              placeholder={'# write your solution here\nprint(2 + 2)'}
+              spellCheck={false}
+              className="flex-1 min-h-[12rem] bg-slate-950 text-emerald-100 font-mono text-xs rounded-lg p-3 resize-none"
+            />
+            <input
+              value={codeStdin}
+              onChange={(e) => setCodeStdin(e.target.value)}
+              placeholder="stdin (optional)"
+              className="mt-2 bg-slate-800 text-white text-xs rounded px-3 py-2"
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={runScratch}
+                disabled={codeBusy || !codeSrc.trim()}
+                className="flex-1 py-2 rounded-lg font-black text-sm bg-cyan-600 disabled:opacity-40"
+              >
+                {codeBusy ? 'Running…' : '▶ Run'}
+              </button>
+              <button
+                onClick={sendCodeAsAnswer}
+                disabled={busy || !codeSrc.trim()}
+                className="flex-1 py-2 rounded-lg font-black text-sm bg-indigo-600 disabled:opacity-40"
+              >
+                ➤ Send as answer
+              </button>
+            </div>
+            {codeOut && (
+              <div className="mt-3 text-xs">
+                <div className="font-bold mb-1">{codeOut.status}</div>
+                {codeOut.compileOutput && <pre className="bg-red-950/60 text-red-200 p-2 rounded whitespace-pre-wrap">{codeOut.compileOutput}</pre>}
+                {codeOut.stdout && <pre className="bg-slate-950 text-emerald-200 p-2 rounded whitespace-pre-wrap">{codeOut.stdout}</pre>}
+                {codeOut.stderr && <pre className="bg-slate-950 text-amber-200 p-2 rounded whitespace-pre-wrap">{codeOut.stderr}</pre>}
+              </div>
+            )}
           </div>
         )}
 
@@ -392,6 +518,13 @@ export const InterviewRoom: React.FC<{
           className={`px-4 py-2 rounded-full font-bold text-sm ${captionsOn ? 'bg-slate-700 text-white' : 'bg-slate-800 text-slate-400'}`}
         >
           💬 CC
+        </button>
+        <button
+          onClick={() => setShowCode((s) => !s)}
+          className={`px-4 py-2 rounded-full font-bold text-sm ${showCode ? 'bg-cyan-600 text-white' : 'bg-slate-700 text-white'}`}
+          title="Code pad — write and run code, then send it as your answer"
+        >
+          💻 Code
         </button>
         <button
           onClick={() => setShowTranscript((s) => !s)}

@@ -17,22 +17,28 @@ function resolveRounds(profile: any, track?: string): any[] {
 }
 
 // Maps profile rounds → AssessmentTest sections (selection rules resolved at
-// attempt start by assessmentService.resolveSection).
-function roundsToSections(rounds: any[]) {
-  return rounds.map((r: any, i: number) => ({
-    title: r.title || `Round ${i + 1}`,
-    kind: r.kind || 'MIXED',
-    order: i,
-    marksPerQuestion: Number(r.marksPerQuestion) || 1,
-    selectionRule: {
-      strategy: r.strategy || 'RANDOM',
-      category: r.category,
-      count: r.count ?? 10,
-      ...(r.difficultyMix ? { difficultyMix: r.difficultyMix } : {}),
-      ...(r.topicSlugs ? { topicSlugs: r.topicSlugs } : {}),
-      verifiedOnly: true,
-    },
-  }));
+// attempt start by assessmentService.resolveSection). For CODING rounds we tag
+// the rule with the company slug so the resolver prefers company-tagged
+// problems (and falls back to the general verified pool).
+function roundsToSections(rounds: any[], companySlug: string) {
+  return rounds.map((r: any, i: number) => {
+    const isCoding = r.category === 'CODING' || r.kind === 'CODING';
+    return {
+      title: r.title || `Round ${i + 1}`,
+      kind: r.kind || 'MIXED',
+      order: i,
+      marksPerQuestion: Number(r.marksPerQuestion) || 1,
+      selectionRule: {
+        strategy: r.strategy || 'RANDOM',
+        category: r.category,
+        count: r.count ?? 10,
+        ...(r.difficultyMix ? { difficultyMix: r.difficultyMix } : {}),
+        ...(r.topicSlugs ? { topicSlugs: r.topicSlugs } : {}),
+        ...(isCoding ? { companySlug } : {}),
+        verifiedOnly: true,
+      },
+    };
+  });
 }
 
 // GET /companies — list with profile summary (rounds + style, no internals)
@@ -155,7 +161,7 @@ router.post('/:id/practice-test', authMiddleware, async (req: AuthRequest, res: 
         status: 'PUBLISHED',
         companyId: company.id,
         createdById: req.userId,
-        sections: { create: roundsToSections(rounds) },
+        sections: { create: roundsToSections(rounds, company.slug) },
       },
     });
     res.json({ testId: test.id, title: test.title, reused: false });

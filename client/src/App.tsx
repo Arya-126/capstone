@@ -29,6 +29,7 @@ import { LeaderboardPage } from './pages/Leaderboard';
 import { ReviewQueue } from './pages/ReviewQueue';
 import { AssessmentList } from './pages/AssessmentList';
 import { CompanyPrep } from './pages/CompanyPrep';
+import { ContestsHub } from './pages/ContestsHub';
 import { AssessmentRunner } from './pages/AssessmentRunner';
 import { TestBuilder } from './pages/TestBuilder';
 import { AdminReports } from './pages/AdminReports';
@@ -429,6 +430,13 @@ const App: React.FC = () => {
               setCompletedInterviewId(interviewId);
               setCurrentPage('ai-interview');
             }}
+          />
+        )}
+
+        {currentPage === 'contests' && auth.user && (
+          <ContestsHub
+            onBack={() => setCurrentPage('dashboard')}
+            onStart={(testId) => { setSelectedAssessmentId(testId); setCurrentPage('assessment-runner'); }}
           />
         )}
 

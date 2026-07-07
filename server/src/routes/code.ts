@@ -3,6 +3,7 @@ import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import {
   runAgainstCases,
+  runSubmission,
   runnerAvailable,
   LANGUAGES,
 } from '../services/codeRunnerService';
@@ -39,6 +40,7 @@ router.get('/problems', authMiddleware, async (_req: AuthRequest, res: Response)
         slug: true,
         difficulty: true,
         verified: true,
+        companies: true,
         topic: { select: { name: true, slug: true } },
       },
       orderBy: [{ topic: { order: 'asc' } }, { difficulty: 'asc' }],
@@ -67,6 +69,7 @@ router.get('/problems/:slug', authMiddleware, async (req: AuthRequest, res: Resp
         timeLimitMs: true,
         memoryLimitMb: true,
         sourceUrl: true,
+        companies: true,
         topic: { select: { name: true, slug: true } },
       },
     });
@@ -75,6 +78,41 @@ router.get('/problems/:slug', authMiddleware, async (req: AuthRequest, res: Resp
   } catch (error) {
     console.error('Get problem error:', error);
     res.status(500).json({ error: 'Failed to fetch problem' });
+  }
+});
+
+// POST /code/scratch { language, source, stdin? } — freeform run for the
+// coding-in-interview pad. No problem, no grading: just executes once and
+// returns stdout/stderr. Sandboxed (Piston) + rate-limited like the others.
+router.post('/scratch', authMiddleware, rateLimit, async (req: AuthRequest, res: Response) => {
+  try {
+    const { language, source, stdin } = req.body;
+    if (!language || !source) {
+      return res.status(400).json({ error: 'language and source are required' });
+    }
+    if (!LANGUAGES[language]) {
+      return res.status(400).json({ error: `Unsupported language: ${language}` });
+    }
+    if (!(await runnerAvailable())) {
+      return res.status(503).json({ error: 'Code runner is not available — is the Piston container running?' });
+    }
+    const r = await runSubmission({
+      source,
+      language,
+      stdin: (stdin ?? '').toString(),
+      timeLimitMs: 3000, // Piston caps run_timeout at 3000ms
+      memoryLimitMb: 256,
+    });
+    res.json({
+      status: r.status,
+      stdout: r.stdout,
+      stderr: r.stderr,
+      compileOutput: r.compileOutput,
+      timeSec: r.timeSec,
+    });
+  } catch (error: any) {
+    console.error('Scratch run error:', error);
+    res.status(500).json({ error: error.message || 'Run failed' });
   }
 });
 

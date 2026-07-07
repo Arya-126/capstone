@@ -9,6 +9,13 @@ interface Turn {
   content: string;
   turnScore: number | null;
   feedback: string | null;
+  isFollowup?: boolean;
+}
+
+interface DeliverySignals {
+  avgWpm: number;
+  totalFillers: number;
+  voiceAnswers: number;
 }
 
 interface Interview {
@@ -20,6 +27,7 @@ interface Interview {
   rubricScores: Record<string, number> | null;
   summary: { strengths: string[]; gaps: string[]; nextSteps: string[] } | null;
   proctoringSummary?: Record<string, number> | null;
+  deliverySignals?: DeliverySignals | null;
   maxQuestions: number;
   turns: Turn[];
 }
@@ -147,6 +155,30 @@ export const InterviewChat: React.FC<{
           </div>
         )}
 
+        {interview.deliverySignals && interview.deliverySignals.voiceAnswers > 0 && (
+          <div className="bg-white border border-gray-100 p-4 rounded-xl mb-6 shadow-sm">
+            <h2 className="font-black mb-2">🗣 Delivery (informational — not scored)</h2>
+            <div className="grid grid-cols-3 gap-3 text-center">
+              <div>
+                <p className="text-2xl font-black text-indigo-600">{interview.deliverySignals.avgWpm}</p>
+                <p className="text-xs text-gray-500">words/min</p>
+                <p className="text-[10px] text-gray-400">
+                  {interview.deliverySignals.avgWpm < 110 ? 'a touch slow' : interview.deliverySignals.avgWpm > 170 ? 'a touch fast' : 'good pace'} · aim 110–160
+                </p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-amber-600">{interview.deliverySignals.totalFillers}</p>
+                <p className="text-xs text-gray-500">filler words</p>
+                <p className="text-[10px] text-gray-400">um, uh, like, you know…</p>
+              </div>
+              <div>
+                <p className="text-2xl font-black text-gray-700">{interview.deliverySignals.voiceAnswers}</p>
+                <p className="text-xs text-gray-500">spoken answers</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {interview.summary && (
           <div className="grid md:grid-cols-3 gap-4 mb-6">
             {([['💪 Strengths', interview.summary.strengths], ['🕳 Gaps', interview.summary.gaps], ['🧭 Next steps', interview.summary.nextSteps]] as const).map(([title, items]) => (
@@ -164,7 +196,10 @@ export const InterviewChat: React.FC<{
         {interview.turns.map((t) => (
           <div key={t.order} className={`mb-3 ${t.role === 'CANDIDATE' ? 'pl-8' : 'pr-8'}`}>
             <div className={`p-4 rounded-xl text-sm whitespace-pre-wrap ${t.role === 'CANDIDATE' ? 'bg-indigo-50' : 'bg-white shadow'}`}>
-              <div className="text-[10px] font-black text-gray-400 mb-1">{t.role === 'CANDIDATE' ? 'YOU' : 'INTERVIEWER'}</div>
+              <div className="text-[10px] font-black text-gray-400 mb-1">
+                {t.role === 'CANDIDATE' ? 'YOU' : 'INTERVIEWER'}
+                {t.isFollowup && <span className="ml-1 text-amber-600">· FOLLOW-UP</span>}
+              </div>
               {t.content}
               {t.feedback && (
                 <div className="mt-2 pt-2 border-t text-xs text-amber-700">
@@ -181,7 +216,7 @@ export const InterviewChat: React.FC<{
 
   // ---- live chat ----
   if (interview) {
-    const questionsAsked = interview.turns.filter((t) => t.role === 'INTERVIEWER').length;
+    const questionsAsked = interview.turns.filter((t) => t.role === 'INTERVIEWER' && !t.isFollowup).length;
     return (
       <div className="max-w-2xl mx-auto flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
         <div className="flex justify-between items-center mb-3">
@@ -197,6 +232,7 @@ export const InterviewChat: React.FC<{
               <div className={`max-w-[85%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${
                 t.role === 'CANDIDATE' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-white shadow rounded-bl-sm'
               }`}>
+                {t.isFollowup && <span className="block text-[9px] font-black text-amber-600 uppercase mb-1">Follow-up</span>}
                 {t.content}
               </div>
             </div>

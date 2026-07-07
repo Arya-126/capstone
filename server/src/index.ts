@@ -14,6 +14,9 @@ import codeRoutes from './routes/code';
 import assessmentsRoutes from './routes/assessments';
 import aiInterviewRoutes from './routes/aiInterview';
 import companiesRoutes from './routes/companies';
+import cohortsRoutes from './routes/cohorts';
+import friendsRoutes from './routes/friends';
+import contestsRoutes from './routes/contests';
 import { authMiddleware } from './middleware/auth';
 
 const app: Express = express();
@@ -38,6 +41,9 @@ app.use('/code', codeRoutes);
 app.use('/assessments', assessmentsRoutes);
 app.use('/ai-interview', aiInterviewRoutes);
 app.use('/companies', companiesRoutes);
+app.use('/cohorts', cohortsRoutes);
+app.use('/friends', friendsRoutes);
+app.use('/contests', contestsRoutes);
 
 // Root route
 app.get('/', (req, res) => {

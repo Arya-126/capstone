@@ -12,6 +12,7 @@ export interface SelectionRule {
   topicSlugs?: string[]; // optional topic filter
   difficultyMix?: Record<string, number>; // {EASY:0.3, MEDIUM:0.5, HARD:0.2}
   verifiedOnly?: boolean;
+  companySlug?: string; // CODING: prefer problems tagged for this company, then fill from the general pool
 }
 
 export interface SnapshotItem {
@@ -89,16 +90,28 @@ async function resolveSection(
     const pool = await prisma.codingProblem.findMany({
       where: {
         ...(verifiedOnly ? { verified: true } : {}),
-        ...(rule.topicSlugs ? { topic: { slug: { in: rule.topicSlugs } } } : {}),
         topic: { category: 'CODING', ...(rule.topicSlugs ? { slug: { in: rule.topicSlugs } } : {}) },
       },
-      select: { id: true, difficulty: true, topicId: true },
+      select: { id: true, difficulty: true, topicId: true, companies: true },
     });
     const candidates = pool.filter((p) => !pinnedIds.has(p.id));
-    const picked =
-      rule.strategy === 'ONE_PER_TOPIC'
-        ? onePerTopic(candidates)
-        : pickWithMix(candidates, rule.count ?? 1, rule.difficultyMix);
+    const want = rule.count ?? 1;
+    const pick = (arr: typeof candidates, n: number) =>
+      rule.strategy === 'ONE_PER_TOPIC' ? onePerTopic(arr) : pickWithMix(arr, n, rule.difficultyMix);
+
+    let picked: typeof candidates;
+    if (rule.companySlug) {
+      // prefer problems tagged for this company, then top up from the general pool
+      const tagged = candidates.filter((p) => p.companies.includes(rule.companySlug!));
+      picked = pick(tagged, want);
+      if (picked.length < want) {
+        const chosen = new Set(picked.map((p) => p.id));
+        const rest = candidates.filter((p) => !chosen.has(p.id));
+        picked = [...picked, ...pick(rest, want - picked.length)];
+      }
+    } else {
+      picked = pick(candidates, want);
+    }
     for (const p of picked) out.push({ ...base, kind: 'coding', id: p.id, order: out.length });
     return out;
   }
@@ -144,10 +157,18 @@ function onePerTopic<T extends { topicId: string }>(pool: T[]): T[] {
 export async function startAttempt(userId: string, testId: string) {
   const test = await prisma.assessmentTest.findUnique({
     where: { id: testId },
-    include: { sections: { include: { items: true }, orderBy: { order: 'asc' } } },
+    include: { sections: { include: { items: true }, orderBy: { order: 'asc' } }, contest: true },
   });
   if (!test) throw new Error('Test not found');
   if (test.status !== 'PUBLISHED') throw new Error('Test is not published');
+
+  // contest-backed tests are only playable inside the contest window (enforced
+  // here so the shared runner can't bypass it)
+  if (test.contest) {
+    const now = new Date();
+    if (now < test.contest.startsAt) throw new Error('Contest has not started yet');
+    if (now > test.contest.endsAt) throw new Error('Contest has ended');
+  }
 
   // resume an open attempt instead of creating a parallel one
   const existing = await prisma.testAttempt.findFirst({

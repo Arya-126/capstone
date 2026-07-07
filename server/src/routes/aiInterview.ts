@@ -7,6 +7,7 @@ import {
   getInterview,
   listInterviews,
   recordProctoringSummary,
+  recordDelivery,
 } from '../services/aiInterviewService';
 import { synthesizeSpeech } from '../services/ttsService';
 
@@ -66,6 +67,16 @@ router.post('/:id/finish', authMiddleware, async (req: AuthRequest, res: Respons
   } catch (error: any) {
     console.error('Interview finish error:', error);
     res.status(400).json({ error: error.message || 'Failed to finish interview' });
+  }
+});
+
+// POST /ai-interview/:id/delivery { avgWpm, totalFillers, voiceAnswers, answers }
+// Speech-delivery cues from the voice room — informational, never scored.
+router.post('/:id/delivery', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    res.json(await recordDelivery(req.params.id, req.userId!, req.body || {}));
+  } catch (error: any) {
+    res.status(400).json({ error: error.message || 'Failed to record delivery' });
   }
 });
 

@@ -43,13 +43,28 @@ function transcriptMessages(turns: { role: string; content: string }[]): ChatMes
   }));
 }
 
+const MAX_FOLLOWUPS_PER_QUESTION = 1;
+
+// Counts main questions asked (follow-ups don't consume the budget) and how many
+// follow-ups have trailed the current question.
+function questionProgress(turns: { role: string; isFollowup?: boolean }[]) {
+  const interviewer = turns.filter((t) => t.role === 'INTERVIEWER');
+  const baseQuestionsAsked = interviewer.filter((t) => !t.isFollowup).length;
+  let followupsOnCurrent = 0;
+  for (let i = interviewer.length - 1; i >= 0; i--) {
+    if (interviewer[i].isFollowup) followupsOnCurrent++;
+    else break; // hit the last base question
+  }
+  return { baseQuestionsAsked, followupsOnCurrent };
+}
+
 async function nextInterviewerTurn(interview: {
   id: string;
   role: string;
   company: { name: string; profile?: any } | null;
-  turns: { role: string; content: string; order: number }[];
+  turns: { role: string; content: string; order: number; isFollowup?: boolean }[];
 }) {
-  const questionNumber = interview.turns.filter((t) => t.role === 'INTERVIEWER').length + 1;
+  const { baseQuestionsAsked, followupsOnCurrent } = questionProgress(interview.turns);
   const styleNotes =
     (interview.company?.profile as any)?.interviewStyle ||
     'No company-specific notes — use a general professional style.';
@@ -57,7 +72,8 @@ async function nextInterviewerTurn(interview: {
     role: interview.role,
     company: interview.company?.name || 'a top tech company',
     maxQuestions: MAX_QUESTIONS,
-    questionNumber: Math.min(questionNumber, MAX_QUESTIONS),
+    baseQuestionsAsked,
+    followupsOnCurrent,
     styleNotes,
   });
 
@@ -67,13 +83,27 @@ async function nextInterviewerTurn(interview: {
     ...(history.length > 0 ? history : [{ role: 'user' as const, content: 'Hi, I am ready to begin.' }]),
   ];
 
-  const content = (await chat(messages, { maxTokens: 400 })).trim();
+  const raw = await chat(messages, { json: true, maxTokens: 400 });
+  const parsed = extractJson<{ kind?: string; message?: string }>(raw);
+  let kind = (parsed?.kind || '').toLowerCase();
+  let message = (parsed?.message || raw).trim();
+
+  // deterministic guards — never trust the model's bookkeeping
+  if (baseQuestionsAsked >= MAX_QUESTIONS) {
+    kind = 'closing';
+  } else if (kind === 'followup' && followupsOnCurrent >= MAX_FOLLOWUPS_PER_QUESTION) {
+    kind = 'question'; // already probed once — advance
+  } else if (kind !== 'followup' && kind !== 'closing') {
+    kind = 'question';
+  }
+
   const turn = await prisma.aiInterviewTurn.create({
     data: {
       interviewId: interview.id,
       role: 'INTERVIEWER',
-      content,
+      content: message,
       order: interview.turns.length,
+      isFollowup: kind === 'followup',
     },
   });
   return turn;
@@ -111,12 +141,15 @@ export async function reply(interviewId: string, userId: string, content: string
   });
 
   const updated = await loadInterview(interviewId, userId);
-  const questionsAsked = updated.turns.filter((t) => t.role === 'INTERVIEWER').length;
+  // follow-ups don't consume the question budget — count only main questions
+  const baseQuestionsAsked = updated.turns.filter(
+    (t) => t.role === 'INTERVIEWER' && !t.isFollowup
+  ).length;
   await nextInterviewerTurn(updated);
 
   // after the closing message that follows the final answered question,
   // score the interview automatically
-  if (questionsAsked >= MAX_QUESTIONS) {
+  if (baseQuestionsAsked >= MAX_QUESTIONS) {
     return finishInterview(interviewId, userId);
   }
   return getInterview(interviewId, userId);
@@ -225,6 +258,7 @@ export async function getInterview(interviewId: string, userId: string) {
     rubricScores: interview.rubricScores,
     summary: interview.summary ? JSON.parse(interview.summary) : null,
     proctoringSummary: interview.proctoringSummary ?? null,
+    deliverySignals: interview.deliverySignals ?? null,
     maxQuestions: MAX_QUESTIONS,
     turns: interview.turns.map((t) => ({
       order: t.order,
@@ -232,8 +266,38 @@ export async function getInterview(interviewId: string, userId: string) {
       content: t.content,
       turnScore: t.turnScore,
       feedback: t.feedback,
+      isFollowup: t.isFollowup,
     })),
   };
+}
+
+// Speech-delivery cues from the voice room (pace, fillers). Informational only —
+// never folded into the rubric score.
+export async function recordDelivery(
+  interviewId: string,
+  userId: string,
+  signals: { avgWpm?: number; totalFillers?: number; voiceAnswers?: number; answers?: any[] }
+) {
+  const interview = await loadInterview(interviewId, userId);
+  const clamp = (n: any, max: number) => Math.max(0, Math.min(max, Math.round(Number(n) || 0)));
+  const clean = {
+    avgWpm: clamp(signals?.avgWpm, 600),
+    totalFillers: clamp(signals?.totalFillers, 10000),
+    voiceAnswers: clamp(signals?.voiceAnswers, 1000),
+    answers: Array.isArray(signals?.answers)
+      ? signals.answers.slice(0, 50).map((a: any) => ({
+          wpm: clamp(a?.wpm, 600),
+          words: clamp(a?.words, 100000),
+          durationSec: clamp(a?.durationSec, 100000),
+          fillers: clamp(a?.fillers, 10000),
+        }))
+      : [],
+  };
+  await prisma.aiInterview.update({
+    where: { id: interview.id },
+    data: { deliverySignals: clean as any },
+  });
+  return { ok: true };
 }
 
 export async function listInterviews(userId: string) {
