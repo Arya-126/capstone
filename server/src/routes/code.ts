@@ -188,6 +188,34 @@ router.post('/submit', authMiddleware, rateLimit, async (req: AuthRequest, res: 
     const score = totalWeight > 0 ? (passedWeight / totalWeight) * 100 : 0;
     const allPassed = results.length === problem.testCases.length && results.every((r) => r.passed);
 
+    // track progress: every submit marks the problem attempted; a 100% hidden-test
+    // pass marks it SOLVED (feeds the coding-track map + coding leaderboard)
+    try {
+      const existing = await prisma.userProblemStatus.findUnique({
+        where: { userId_problemId: { userId: req.userId!, problemId } },
+      });
+      const nowSolved = allPassed || existing?.status === 'SOLVED';
+      await prisma.userProblemStatus.upsert({
+        where: { userId_problemId: { userId: req.userId!, problemId } },
+        update: {
+          status: nowSolved ? 'SOLVED' : 'ATTEMPTED',
+          bestScore: Math.max(existing?.bestScore ?? 0, score),
+          attempts: { increment: 1 },
+          ...(allPassed && existing?.status !== 'SOLVED' ? { solvedAt: new Date() } : {}),
+        },
+        create: {
+          userId: req.userId!,
+          problemId,
+          status: allPassed ? 'SOLVED' : 'ATTEMPTED',
+          bestScore: score,
+          attempts: 1,
+          ...(allPassed ? { solvedAt: new Date() } : {}),
+        },
+      });
+    } catch (e) {
+      console.warn('UserProblemStatus update failed (non-fatal):', e);
+    }
+
     // During a test attempt (Phase 4), persist the response server-side
     if (attemptId) {
       const attempt = await prisma.testAttempt.findUnique({ where: { id: attemptId } });

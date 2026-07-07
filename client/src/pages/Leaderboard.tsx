@@ -8,14 +8,17 @@ interface LeaderboardUser {
   xpTotal: number;
   streakDays: number;
   rank?: number;
+  metricValue?: number;
 }
 interface LeaderboardData {
   leaderboard: LeaderboardUser[];
   currentUser: LeaderboardUser | null;
   scope?: string;
+  metric?: string;
   needsCohort?: boolean;
 }
 type Scope = 'global' | 'cohort' | 'friends';
+type Metric = 'xp' | 'coding' | 'aptitude';
 
 const TABS: { key: Scope; label: string }[] = [
   { key: 'global', label: '🌍 Global' },
@@ -23,36 +26,67 @@ const TABS: { key: Scope; label: string }[] = [
   { key: 'friends', label: '👥 Friends' },
 ];
 
+const METRIC_TABS: { key: Metric; label: string }[] = [
+  { key: 'xp', label: '⚡ XP' },
+  { key: 'coding', label: '💻 Coding' },
+  { key: 'aptitude', label: '🧮 Aptitude' },
+];
+
+const METRIC_SUBTITLE: Record<Metric, string> = {
+  xp: 'Ranked by Total XP',
+  coding: 'Ranked by Problems Solved',
+  aptitude: 'Ranked by Average Test Score',
+};
+
+const fmtMetric = (metric: Metric, value: number) =>
+  metric === 'coding' ? `${value} solved` : `${value}% avg`;
+
 export const LeaderboardPage: React.FC = () => {
   const [scope, setScope] = useState<Scope>('global');
+  const [metric, setMetric] = useState<Metric>('xp');
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(() => {
     setLoading(true);
     apiClient
-      .get<LeaderboardData>(`/leaderboard?scope=${scope}`)
+      .get<LeaderboardData>(`/leaderboard?scope=${scope}&metric=${metric}`)
       .then(setData)
       .catch(() => setData(null))
       .finally(() => setLoading(false));
-  }, [scope]);
+  }, [scope, metric]);
   useEffect(load, [load]);
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-8 rounded-lg shadow-lg text-white mb-6">
         <h2 className="text-4xl font-bold text-center mb-2">🏆 Leaderboard</h2>
-        <p className="text-center text-yellow-100">Ranked by Total XP</p>
+        <p className="text-center text-yellow-100">{METRIC_SUBTITLE[metric]}</p>
       </div>
 
       {/* scope tabs */}
-      <div className="flex gap-2 mb-6 justify-center">
+      <div className="flex gap-2 mb-3 justify-center">
         {TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setScope(t.key)}
             className={`px-5 py-2 rounded-full font-bold text-sm transition ${
               scope === t.key ? 'bg-indigo-600 text-white shadow' : 'bg-white text-gray-600 hover:bg-indigo-50'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* metric tabs */}
+      <div className="flex gap-2 mb-6 justify-center">
+        {METRIC_TABS.map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setMetric(t.key)}
+            className={`px-4 py-1.5 rounded-full font-bold text-xs transition ${
+              metric === t.key ? 'bg-emerald-600 text-white shadow' : 'bg-white text-gray-600 hover:bg-emerald-50'
             }`}
           >
             {t.label}
@@ -78,6 +112,7 @@ export const LeaderboardPage: React.FC = () => {
                 <p className="font-bold text-lg text-indigo-900">Your Rank</p>
                 <p className="text-sm text-indigo-700">
                   Level {data.currentUser.level} • {data.currentUser.xpTotal.toLocaleString()} XP • 🔥 {data.currentUser.streakDays}
+                  {metric !== 'xp' && ` • ${fmtMetric(metric, data.currentUser.metricValue ?? 0)}`}
                 </p>
               </div>
             </div>
@@ -99,7 +134,9 @@ export const LeaderboardPage: React.FC = () => {
                     <th className="px-6 py-4 font-semibold text-gray-600">Rank</th>
                     <th className="px-6 py-4 font-semibold text-gray-600">Student</th>
                     <th className="px-6 py-4 font-semibold text-gray-600 text-right">Streak</th>
-                    <th className="px-6 py-4 font-semibold text-gray-600 text-right">XP</th>
+                    <th className="px-6 py-4 font-semibold text-gray-600 text-right">
+                      {metric === 'xp' ? 'XP' : metric === 'coding' ? 'Solved' : 'Avg Score'}
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -134,7 +171,7 @@ export const LeaderboardPage: React.FC = () => {
                           )}
                         </td>
                         <td className="px-6 py-4 text-right font-bold text-indigo-600">
-                          {user.xpTotal.toLocaleString()}
+                          {metric === 'xp' ? user.xpTotal.toLocaleString() : fmtMetric(metric, user.metricValue ?? 0)}
                         </td>
                       </tr>
                     );

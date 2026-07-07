@@ -33,6 +33,7 @@ model User {
   createdTests     AssessmentTest[] @relation("CreatedTests")
   friendRequests   Friendship[]     @relation("FriendRequests")
   friendOf         Friendship[]     @relation("FriendOf")
+  problemStatuses  UserProblemStatus[]
 }
 
 enum Role {
@@ -430,12 +431,15 @@ model CodingProblem {
   source            String?
   sourceUrl         String? // attribution link (e.g. A2Z sheet item)
   companies         String[]             @default([]) // company slugs this problem is tagged for (e.g. ["amazon","microsoft"])
+  track             String? // coding-track slug (defaults to topic slug), e.g. "arrays"
+  level             Int                  @default(1) // 1=easy warmup … 4=hard; drives the track map
   verified          Boolean              @default(false) // true once reference solution passes all test cases
   createdAt         DateTime             @default(now())
 
   testCases    TestCase[]
   sectionItems TestSectionItem[]
   responses    AttemptResponse[]
+  userStatuses UserProblemStatus[]
 }
 
 model TestCase {
@@ -639,4 +643,44 @@ model Contest {
   cohort      Cohort?        @relation(fields: [cohortId], references: [id])
   settledAt   DateTime? // placement XP awarded once after endsAt
   createdAt   DateTime       @default(now())
+}
+
+// ===== CODING TRACKS (Phase D) =====
+
+enum ProblemStatus {
+  ATTEMPTED
+  SOLVED
+}
+
+// Per-user progress on a coding problem — rows exist only once attempted.
+// SOLVED = a /code/submit that passed 100% of hidden tests.
+model UserProblemStatus {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  problemId String
+  problem   CodingProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  status    ProblemStatus @default(ATTEMPTED)
+  bestScore Float         @default(0) // 0..100, best weighted hidden-test score
+  attempts  Int           @default(0)
+  solvedAt  DateTime?
+  updatedAt DateTime      @updatedAt
+
+  @@unique([userId, problemId])
+  @@index([userId, status])
+}
+
+// ===== HR & BEHAVIORAL BANK (Phase F) =====
+
+model HrQuestion {
+  id            String   @id @default(uuid())
+  question      String
+  category      String // intro | strengths | weakness | failure | conflict | teamwork | leadership | why-us | career-goals | pressure | situational
+  starGuidance  String // markdown: how to structure the answer (STAR where applicable)
+  sampleOutline String? // markdown: skeleton of a strong answer (never a script to memorize)
+  companyTags   String[] @default([]) // company slugs that famously ask this
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([category])
 }

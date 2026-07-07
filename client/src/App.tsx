@@ -31,6 +31,11 @@ import { AssessmentList } from './pages/AssessmentList';
 import { CompanyPrep } from './pages/CompanyPrep';
 import { ContestsHub } from './pages/ContestsHub';
 import { AssessmentRunner } from './pages/AssessmentRunner';
+import { InterviewHome } from './pages/InterviewHome';
+import { CodingTracks } from './pages/CodingTracks';
+import { ProblemSolver } from './pages/ProblemSolver';
+import { HrPrep } from './pages/HrPrep';
+import { LeftNav } from './components/LeftNav';
 import { TestBuilder } from './pages/TestBuilder';
 import { AdminReports } from './pages/AdminReports';
 import { InterviewChat } from './pages/InterviewChat';
@@ -67,6 +72,7 @@ const App: React.FC = () => {
   const [selectedDomainSlug, setSelectedDomainSlug] = useState<string | null>(() => sessionStorage.getItem('selectedDomainSlug'));
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(() => sessionStorage.getItem('selectedAssessmentId'));
   const [selectedCompanySlug, setSelectedCompanySlug] = useState<string | null>(() => sessionStorage.getItem('selectedCompanySlug'));
+  const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(() => sessionStorage.getItem('selectedProblemSlug'));
   const [videoInterviewConfig, setVideoInterviewConfig] = useState<{ role: string; companyId: string | null } | null>(null);
   const [completedInterviewId, setCompletedInterviewId] = useState<string | null>(null);
   const [selectedInterviewCategorySlug, setSelectedInterviewCategorySlug] = useState<string | null>(() => sessionStorage.getItem('selectedInterviewCategorySlug'));
@@ -87,6 +93,7 @@ const App: React.FC = () => {
     if (selectedDomainSlug) sessionStorage.setItem('selectedDomainSlug', selectedDomainSlug); else sessionStorage.removeItem('selectedDomainSlug');
     if (selectedAssessmentId) sessionStorage.setItem('selectedAssessmentId', selectedAssessmentId); else sessionStorage.removeItem('selectedAssessmentId');
     if (selectedCompanySlug) sessionStorage.setItem('selectedCompanySlug', selectedCompanySlug); else sessionStorage.removeItem('selectedCompanySlug');
+    if (selectedProblemSlug) sessionStorage.setItem('selectedProblemSlug', selectedProblemSlug); else sessionStorage.removeItem('selectedProblemSlug');
     if (selectedInterviewCategorySlug) sessionStorage.setItem('selectedInterviewCategorySlug', selectedInterviewCategorySlug); else sessionStorage.removeItem('selectedInterviewCategorySlug');
     if (selectedInterviewTopicId) sessionStorage.setItem('selectedInterviewTopicId', selectedInterviewTopicId); else sessionStorage.removeItem('selectedInterviewTopicId');
   }, [currentPage, selectedTopicId, selectedTopicName, selectedGameType, selectedDomainSlug, selectedInterviewCategorySlug, selectedInterviewTopicId]);
@@ -126,7 +133,7 @@ const App: React.FC = () => {
       localStorage.setItem('token', response.token);
       apiClient.setToken(response.token);
       setAuth({ user: response.user, token: response.token, loading: false });
-      setCurrentPage('dashboard');
+      setCurrentPage('interview-home');
     } catch (error) {
       const msg = 'Registration failed. Please try again.';
       setError(msg);
@@ -143,7 +150,7 @@ const App: React.FC = () => {
       localStorage.setItem('token', response.token);
       apiClient.setToken(response.token);
       setAuth({ user: response.user, token: response.token, loading: false });
-      setCurrentPage('dashboard');
+      setCurrentPage('interview-home');
     } catch (error) {
       const msg = 'Login failed. Please check your credentials.';
       setError(msg);
@@ -206,7 +213,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <button
             onClick={() => {
-              setCurrentPage(auth.user ? 'dashboard' : 'home');
+              setCurrentPage(auth.user ? 'interview-home' : 'home');
               setError(null);
             }}
             className="flex items-center gap-2 cursor-pointer group"
@@ -271,8 +278,13 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Page Content */}
+      {/* Page Content — persistent left nav for signed-in users (interview-first IA) */}
       <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex gap-6 items-start">
+          {auth.user && currentPage !== 'interview-room' && (
+            <LeftNav currentPage={currentPage} role={auth.user.role} onNavigate={(p) => { setCurrentPage(p); setError(null); }} />
+          )}
+          <main className="flex-1 min-w-0">
         {currentPage === 'home' && !auth.user && (
           <div className="text-center py-10 animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 mb-6 bg-indigo-50 border border-indigo-100 rounded-full text-sm font-semibold text-indigo-700">
@@ -326,6 +338,38 @@ const App: React.FC = () => {
 
         {currentPage === 'register' && !auth.user && (
           <RegisterPage onRegister={handleRegister} loading={auth.loading} />
+        )}
+
+        {currentPage === 'interview-home' && auth.user && (
+          <InterviewHome userName={auth.user.name} onNavigate={(p) => { setCurrentPage(p); setError(null); }} />
+        )}
+
+        {currentPage === 'coding-tracks' && auth.user && (
+          <CodingTracks
+            onBack={() => setCurrentPage('interview-home')}
+            onOpenProblem={(slug) => { setSelectedProblemSlug(slug); setCurrentPage('problem-solver'); }}
+          />
+        )}
+
+        {currentPage === 'problem-solver' && auth.user && selectedProblemSlug && (
+          <ProblemSolver
+            key={selectedProblemSlug}
+            slug={selectedProblemSlug}
+            onBack={() => { setSelectedProblemSlug(null); setCurrentPage('coding-tracks'); }}
+          />
+        )}
+
+        {currentPage === 'hr-prep' && auth.user && (
+          <HrPrep
+            onBack={() => setCurrentPage('interview-home')}
+            onPracticeWithAI={(question) => {
+              setCompletedInterviewId(null);
+              // free-text role seeds the interviewer prompt, so the session
+              // orients around this exact HR question — no backend change needed
+              setVideoInterviewConfig({ role: `HR round — practice this question: "${question.slice(0, 140)}"`, companyId: null });
+              setCurrentPage('interview-room');
+            }}
+          />
         )}
 
         {currentPage === 'dashboard' && auth.user && (
@@ -612,6 +656,8 @@ const App: React.FC = () => {
             )}
           </div>
         )}
+          </main>
+        </div>
       </div>
     </div>
   );
