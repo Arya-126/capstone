@@ -73,6 +73,8 @@ const App: React.FC = () => {
   const [selectedAssessmentId, setSelectedAssessmentId] = useState<string | null>(() => sessionStorage.getItem('selectedAssessmentId'));
   const [selectedCompanySlug, setSelectedCompanySlug] = useState<string | null>(() => sessionStorage.getItem('selectedCompanySlug'));
   const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(() => sessionStorage.getItem('selectedProblemSlug'));
+  // which flow launched the current classic game — decides where quit/complete returns
+  const [gameOrigin, setGameOrigin] = useState<'arcade' | 'interview'>(() => (sessionStorage.getItem('gameOrigin') as 'arcade' | 'interview') || 'arcade');
   const [videoInterviewConfig, setVideoInterviewConfig] = useState<{ role: string; companyId: string | null } | null>(null);
   const [completedInterviewId, setCompletedInterviewId] = useState<string | null>(null);
   const [selectedInterviewCategorySlug, setSelectedInterviewCategorySlug] = useState<string | null>(() => sessionStorage.getItem('selectedInterviewCategorySlug'));
@@ -94,6 +96,7 @@ const App: React.FC = () => {
     if (selectedAssessmentId) sessionStorage.setItem('selectedAssessmentId', selectedAssessmentId); else sessionStorage.removeItem('selectedAssessmentId');
     if (selectedCompanySlug) sessionStorage.setItem('selectedCompanySlug', selectedCompanySlug); else sessionStorage.removeItem('selectedCompanySlug');
     if (selectedProblemSlug) sessionStorage.setItem('selectedProblemSlug', selectedProblemSlug); else sessionStorage.removeItem('selectedProblemSlug');
+    sessionStorage.setItem('gameOrigin', gameOrigin);
     if (selectedInterviewCategorySlug) sessionStorage.setItem('selectedInterviewCategorySlug', selectedInterviewCategorySlug); else sessionStorage.removeItem('selectedInterviewCategorySlug');
     if (selectedInterviewTopicId) sessionStorage.setItem('selectedInterviewTopicId', selectedInterviewTopicId); else sessionStorage.removeItem('selectedInterviewTopicId');
   }, [currentPage, selectedTopicId, selectedTopicName, selectedGameType, selectedDomainSlug, selectedInterviewCategorySlug, selectedInterviewTopicId]);
@@ -177,13 +180,14 @@ const App: React.FC = () => {
     setSelectedTopicId(topicId);
     setSelectedTopicName(topicName);
     setSelectedGameType(gameType);
+    setGameOrigin('arcade');
     setCurrentPage('game');
   };
 
   const handleGameComplete = () => {
-    setCurrentPage('dashboard');
+    setCurrentPage(gameOrigin === 'interview' ? 'interview-game-select' : 'dashboard');
     setSelectedTopicId(null);
-    setSelectedTopicName('');
+    if (gameOrigin !== 'interview') setSelectedTopicName('');
     setSelectedGameType(null);
     
     // Refresh user object to get new XP
@@ -534,6 +538,7 @@ const App: React.FC = () => {
           <InterviewTheory
             topicId={selectedInterviewTopicId}
             onReadyToPractice={() => setCurrentPage('interview-quiz')}
+            onStudyGames={() => setCurrentPage('interview-game-select')}
             onBack={() => setCurrentPage('interview-category')}
           />
         )}
@@ -552,6 +557,14 @@ const App: React.FC = () => {
             topicId={selectedInterviewTopicId}
             topicName={selectedTopicName}
             onSelectGame={(gameId) => setCurrentPage(`interview-${gameId}`)}
+            onSelectClassicGame={(gameType) => {
+              // classic engines fetch /games/mini/:topicId — the polymorphic
+              // route serves interview topics from theory, so just point them at it
+              setSelectedTopicId(selectedInterviewTopicId);
+              setSelectedGameType(gameType);
+              setGameOrigin('interview');
+              setCurrentPage('game');
+            }}
             onBack={() => setCurrentPage('interview-category')}
           />
         )}
@@ -598,11 +611,11 @@ const App: React.FC = () => {
         {currentPage === 'game' && auth.user && selectedTopicId && selectedGameType && (
           <div>
             <div className="mb-6 max-w-4xl mx-auto">
-              <button 
-                onClick={() => setCurrentPage('arcade')} 
+              <button
+                onClick={() => setCurrentPage(gameOrigin === 'interview' ? 'interview-game-select' : 'arcade')}
                 className="text-red-500 hover:text-red-700 font-bold transition-colors flex items-center"
               >
-                <span className="mr-2">🚪</span> Quit Game & Return to Arcade
+                <span className="mr-2">🚪</span> Quit Game & Return
               </button>
             </div>
             {selectedGameType === 'MCQ' && (

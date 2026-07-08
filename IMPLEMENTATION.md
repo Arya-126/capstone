@@ -1,8 +1,18 @@
 # Implementation Status
 
-_Last updated: 2026-07-07. Companion to [docs/interview-platform-plan.md](docs/interview-platform-plan.md) (full build plan) and [STATUS.md](STATUS.md) (platform audit)._
+_Last updated: 2026-07-08. Companion to [docs/interview-platform-plan.md](docs/interview-platform-plan.md) (full build plan) and [STATUS.md](STATUS.md) (platform audit)._
 
 ## ✅ Implemented
+
+### Phases B + D + F (2026-07-08 session)
+- **Phase B — Interview-first IA**: `InterviewHome.tsx` is the post-login landing page; persistent `LeftNav` (PREP / COMPETE / MORE / ADMIN sections) wraps all signed-in pages; `StatsSidebar` (XP/streak/rank, coding progress, weak topics, mini leaderboard) backed by `GET /leaderboard/sidebar`; leaderboard gained **metric tabs** (XP | Coding = problems solved | Aptitude = avg best test score) on top of the existing scope tabs (global | cohort | friends).
+- **Phase D — Coding tracks**: `CodingProblem.track/level` + `UserProblemStatus` (ATTEMPTED/SOLVED, bestScore, auto-updated by `/code/submit`); `GET /coding-tracks` track map + `/summary`; `CodingTracks.tsx` (level node chains, per-track %) → standalone `ProblemSolver.tsx` (statement + RichText/KaTeX, per-language editor, run samples / submit hidden, solved banner). Bank grown 22 → **36 problems, all Piston-verified** (14 new original problems across linked-list, trees, graphs, DP, binary-search, two-pointers, sliding-window, stacks-queues, strings, heaps via `seed-tracks.ts`).
+- **Phase F — HR & behavioral bank**: `HrQuestion` model + `/hr` routes; **60 authored questions** across 11 categories with STAR guidance, sample outlines, and company tags (`seed-hr.ts`); `HrPrep.tsx` browse page whose "Practice with AI" deep-links into the voice+avatar interview room seeded with the chosen question.
+
+### Competitive pillars (2026-07-07 session, commit f51a710)
+- **Company pattern engine**: per-company readiness index (`readinessService.ts`), prep hub (`CompanyPrep.tsx`), role tracks, round drills, company-tagged coding problems preferred in CODING rounds.
+- **Cohorts / contests / social**: cohort join codes, friends graph, scoped leaderboards, timed contests reusing the assessment engine with score+speed ranking and idempotent placement-XP settlement.
+- **Interview realism**: adaptive follow-up probing (JSON interviewer turns + deterministic guards), in-room code pad (`/code/scratch`), speech-delivery signals (WPM/fillers, informational), free neural TTS (Edge) with real lip-sync on a photo avatar.
 
 ### Platform base (Phases 1–8, June 2026)
 - **Aptitude bank** — 868 questions (Quant / Logical / Verbal) seeded from the handout, 62-topic taxonomy
@@ -35,31 +45,21 @@ _Last updated: 2026-07-07. Companion to [docs/interview-platform-plan.md](docs/i
 | Repair the 46 missing-context questions | manual (review queue) or re-extraction once handout PDF is back | admin → Review Queue → 🧩 Missing Context |
 | Formula-cleanup LLM pass (mangled stems → LaTeX for RichText) | same quota reset | new script, pattern of solve-and-verify |
 
-### Phase B — Interview-first IA (not started)
-- Interview Prep home page replacing Dashboard as landing
-- Persistent left nav (Aptitude / CS Core / Coding / Companies / HR / Mock Tests / Games)
-- `<StatsSidebar/>` — XP, streak, readiness, weak topics, mini leaderboard
-- Leaderboard filters (overall / coding / aptitude / weekly / company)
+### Phase B — Interview-first IA ✅ (done 2026-07-08; "weekly" leaderboard filter still open — needs an XP event log)
 
-### Phase C — Company-wise sections (not started)
-- `CompanyQuestion` tag table (kind: CODING | TECHNICAL | HR)
-- `CompanyDetail.tsx` with tabs: Overview · Coding · Technical · HR · Pattern Mock · AI Interview
-- Per-company progress %, company-tagged question/problem sets
-- HR guidance per company + "Practice in AI Interview" deep link
+### Phase C — Company-wise sections (partially covered)
+- ✅ Company prep hub with readiness, pattern mock, AI interview, coding-round tagging, HR company tags
+- ⏳ Remaining: `CompanyQuestion` TECHNICAL tag table + a tabbed `CompanyDetail.tsx` (Overview · Coding · Technical · HR) consolidating the pieces that now exist separately
 
-### Phase D — Coding tracks (not started)
-- `level`/`track` on CodingProblem, `UserProblemStatus` (solved/attempted), completion map UI
-- Standalone `ProblemSolver.tsx` extracted from the runner
-- ~46 new problems over the Striver SDE-sheet syllabus (original statements, run-the-reference cases)
+### Phase D — Coding tracks ✅ core done 2026-07-08
+- ⏳ Remaining: grow the bank 36 → ~60 problems over the rest of the Striver-sheet syllabus (tries, bit-manipulation, more DP/graphs)
 
 ### Phase E — CS Core subjects (PDF staged, extraction not started)
 - Extraction script for `cs_core_notes.pdf` → chapter-structured theory JSON (OS / OOPs / DBMS+SQL / CN)
 - `CS_CORE` taxonomy + theory pages + per-chapter MCQs (LLM-generate → review queue → verify)
 - Subject mock tests via existing assessment engine
 
-### Phase F — HR & behavioral bank (not started)
-- `HrQuestion` model, ~60 standard questions with STAR guidance, company tags
-- Browse page + AI-interview deep link
+### Phase F — HR & behavioral bank ✅ (done 2026-07-08)
 
 ### Phase G — Study games for interview prep (not started)
 - `gameContentService` interview/CS-core mode (Memory Match formulas, Fill-the-Blank, Hangman terms, Concept Cannon true/false)

@@ -3,6 +3,11 @@ import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { getQuestions, GeneratedQuestion } from '../services/questionService';
 import { getGameContent } from '../services/gameContentService';
+import {
+  getInterviewGameContent,
+  contentAvailability,
+  TheoryInput,
+} from '../services/interviewGameContentService';
 import { redis } from '../lib/redis';
 import { XP_RULES, awardXp, calculateMiniGameXp } from '../services/xpService';
 import { updateDomainXpAndRank, checkLevelAdvancement } from '../services/domainService';
@@ -41,29 +46,73 @@ router.get('/arcade/:topicId', authMiddleware, async (req: AuthRequest, res: Res
   }
 });
 
+// Interview topics live in a separate table; their game content is derived
+// DETERMINISTICALLY from InterviewTheory (static-data philosophy — no LLM).
+async function loadInterviewTheory(topicId: string): Promise<{ name: string; theory: TheoryInput } | null> {
+  const t = await prisma.interviewTopic.findUnique({
+    where: { id: topicId },
+    include: { theory: true },
+  });
+  if (!t?.theory) return null;
+  const asArr = (v: any): string[] => (Array.isArray(v) ? v.map(String) : []);
+  return {
+    name: t.name,
+    theory: {
+      topicName: t.name,
+      rawTheory: t.theory.rawTheory || '',
+      keyPoints: asArr(t.theory.keyPoints),
+      formulas: asArr(t.theory.formulas),
+    },
+  };
+}
+
+// ── GET /games/interview-availability/:topicId ──
+// Which classic games have enough theory content for this interview topic
+router.get('/interview-availability/:topicId', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const iv = await loadInterviewTheory(req.params.topicId);
+    if (!iv) return res.status(404).json({ error: 'No theory for this topic' });
+    res.json(contentAvailability(iv.theory));
+  } catch (error) {
+    console.error('Interview availability error:', error);
+    res.status(500).json({ error: 'Failed to check availability' });
+  }
+});
+
 // ── GET /games/mini/:topicId/:gameType ──
-// Generates mini-game content via LLM
+// Learning topics: content via LLM. Interview topics: deterministic from theory.
 router.get('/mini/:topicId/:gameType', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
     const { topicId, gameType } = req.params;
     const difficulty = (parseInt(req.query.difficulty as string) || 2) as 1 | 2 | 3;
-
-    const topic = await prisma.topic.findUnique({ where: { id: topicId } });
-    if (!topic) return res.status(404).json({ error: 'Topic not found' });
 
     const validTypes = ['MEMORY_MATCH', 'WORD_SCRAMBLE', 'CROSSWORD', 'HANGMAN', 'FILL_BLANK', 'CONCEPT_CANNON'];
     if (!validTypes.includes(gameType)) {
       return res.status(400).json({ error: `Invalid game type. Must be one of: ${validTypes.join(', ')}` });
     }
 
-    const content = await getGameContent(gameType, topic.subtopic, difficulty);
+    const topic = await prisma.topic.findUnique({ where: { id: topicId } });
+    let content;
+    let topicLabel: { topicName: string; subtopic: string };
+    let source: 'domain' | 'interview' = 'domain';
+
+    if (topic) {
+      content = await getGameContent(gameType, topic.subtopic, difficulty);
+      topicLabel = { topicName: topic.topic, subtopic: topic.subtopic };
+    } else {
+      const iv = await loadInterviewTheory(topicId);
+      if (!iv) return res.status(404).json({ error: 'Topic not found' });
+      content = getInterviewGameContent(gameType, iv.theory);
+      topicLabel = { topicName: iv.name, subtopic: iv.name };
+      source = 'interview';
+    }
 
     // For answer-sensitive games, store answers server-side
     const sessionKey = `game_session:${req.userId}:${Date.now()}`;
 
     if (gameType === 'FILL_BLANK') {
       // Store full content with answers in Redis, send content without answers
-      await redis.set(sessionKey, JSON.stringify(content), 'EX', 3600);
+      await redis.set(sessionKey, JSON.stringify({ ...content, source }), 'EX', 3600);
       const clientContent = {
         sentences: (content as any).sentences.map((s: any) => ({
           text: s.text,
@@ -71,12 +120,12 @@ router.get('/mini/:topicId/:gameType', authMiddleware, async (req: AuthRequest, 
           // blank (correct answer) is NOT sent
         })),
       };
-      return res.json({ sessionKey, topicId, gameType, difficulty, content: clientContent, topicName: topic.topic, subtopic: topic.subtopic });
+      return res.json({ sessionKey, topicId, gameType, difficulty, content: clientContent, topicName: topicLabel.topicName, subtopic: topicLabel.subtopic });
     }
 
     // For other games, send full content (answers are implicit in gameplay)
-    await redis.set(sessionKey, JSON.stringify({ gameType, topicId, difficulty }), 'EX', 3600);
-    res.json({ sessionKey, topicId, gameType, difficulty, content, topicName: topic.topic, subtopic: topic.subtopic });
+    await redis.set(sessionKey, JSON.stringify({ gameType, topicId, difficulty, source }), 'EX', 3600);
+    res.json({ sessionKey, topicId, gameType, difficulty, content, topicName: topicLabel.topicName, subtopic: topicLabel.subtopic });
   } catch (error) {
     console.error('Mini-game content error:', error);
     res.status(500).json({ error: 'Failed to generate game content' });
@@ -105,6 +154,44 @@ router.post('/mini/submit', authMiddleware, async (req: AuthRequest, res: Respon
 
     const xpEarned = calculateMiniGameXp(gameType, scorePercent, isPerfect, isFast);
 
+    // Interview-topic games record progress on UserInterviewProgress instead of
+    // GameSession (whose topicId FKs the learning Topic table).
+    const topic = await prisma.topic.findUnique({ where: { id: topicId } });
+    if (!topic) {
+      const ivTopic = await prisma.interviewTopic.findUnique({ where: { id: topicId } });
+      if (!ivTopic) return res.status(404).json({ error: 'Topic not found' });
+
+      const existing = await prisma.userInterviewProgress.findUnique({
+        where: { userId_topicId: { userId, topicId } },
+      });
+      const games = existing?.gamesPlayed ?? 0;
+      await prisma.userInterviewProgress.upsert({
+        where: { userId_topicId: { userId, topicId } },
+        update: {
+          gamesPlayed: games + 1,
+          bestScore: Math.max(existing?.bestScore ?? 0, scorePercent),
+          avgScore: ((existing?.avgScore ?? 0) * games + scorePercent) / (games + 1),
+          totalXp: { increment: xpEarned },
+          lastPlayedAt: new Date(),
+        },
+        create: {
+          userId,
+          topicId,
+          gamesPlayed: 1,
+          bestScore: scorePercent,
+          avgScore: scorePercent,
+          totalXp: xpEarned,
+          lastPlayedAt: new Date(),
+        },
+      });
+      await awardXp(userId, xpEarned);
+      if (isPerfect) await checkAchievements({ userId, type: 'perfect_score', data: {} });
+      if (isFast) await checkAchievements({ userId, type: 'speed_run', data: { durationSec: durationSec || 0 } });
+      const earned = await checkAchievements({ userId, type: 'game_completed', data: { gameType, score: scorePercent } });
+      await redis.del(sessionKey);
+      return res.json({ score: scorePercent, xpEarned, gameType, isPerfect, isFast, promotedTo: null, levelAdvanced: false, earnedAchievements: earned });
+    }
+
     // Create game session record
     await prisma.gameSession.create({
       data: {
@@ -125,7 +212,6 @@ router.post('/mini/submit', authMiddleware, async (req: AuthRequest, res: Respon
     let levelAdvanced = false;
     let earnedAchievements = [];
 
-    const topic = await prisma.topic.findUnique({ where: { id: topicId } });
     if (topic?.domainId) {
       const promotionResult = await updateDomainXpAndRank(userId, topic.domainId, xpEarned);
       promotedTo = promotionResult.promotedTo;

@@ -13,10 +13,11 @@ interface TheoryData {
 interface Props {
   topicId: string;
   onReadyToPractice: () => void;
+  onStudyGames?: () => void;
   onBack: () => void;
 }
 
-export const InterviewTheory: React.FC<Props> = ({ topicId, onReadyToPractice, onBack }) => {
+export const InterviewTheory: React.FC<Props> = ({ topicId, onReadyToPractice, onStudyGames, onBack }) => {
   const [theory, setTheory] = useState<TheoryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [cleaning, setCleaning] = useState(false);
@@ -149,13 +150,21 @@ export const InterviewTheory: React.FC<Props> = ({ topicId, onReadyToPractice, o
         ))}
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex flex-wrap justify-center gap-4">
         <button
           onClick={onReadyToPractice}
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xl py-4 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1"
         >
           🎮 Ready to Practice!
         </button>
+        {onStudyGames && (
+          <button
+            onClick={onStudyGames}
+            className="bg-white hover:bg-emerald-50 text-emerald-700 border-2 border-emerald-500 font-bold text-xl py-4 px-12 rounded-full shadow-lg transition transform hover:-translate-y-1"
+          >
+            🎮 Study with Games
+          </button>
+        )}
       </div>
     </div>
   );
