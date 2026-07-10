@@ -29,6 +29,7 @@ import { LeaderboardPage } from './pages/Leaderboard';
 import { ReviewQueue } from './pages/ReviewQueue';
 import { AssessmentList } from './pages/AssessmentList';
 import { CompanyPrep } from './pages/CompanyPrep';
+import { CompanyDetail } from './pages/CompanyDetail';
 import { ContestsHub } from './pages/ContestsHub';
 import { AssessmentRunner } from './pages/AssessmentRunner';
 import { InterviewHome } from './pages/InterviewHome';
@@ -430,13 +431,20 @@ const App: React.FC = () => {
         )}
 
         {currentPage === 'company-prep' && auth.user && selectedCompanySlug && (
-          <CompanyPrep
+          <CompanyDetail
             slug={selectedCompanySlug}
             onBack={() => setCurrentPage('assessments')}
             onStartTest={(testId) => { setSelectedAssessmentId(testId); setCurrentPage('assessment-runner'); }}
             onStartInterview={(role, companyId) => {
               setCompletedInterviewId(null);
               setVideoInterviewConfig({ role, companyId });
+              setCurrentPage('interview-room');
+            }}
+            onOpenProblem={(problemSlug) => { setSelectedProblemSlug(problemSlug); setCurrentPage('problem-solver'); }}
+            onPracticeHr={(question) => {
+              sessionStorage.setItem('hrPracticeQuestion', question.question);
+              setCompletedInterviewId(null);
+              setVideoInterviewConfig({ role: 'HR', companyId: null });
               setCurrentPage('interview-room');
             }}
           />

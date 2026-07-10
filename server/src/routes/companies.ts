@@ -118,6 +118,78 @@ router.get('/:slug/prep', authMiddleware, async (req: AuthRequest, res: Response
   }
 });
 
+// GET /companies/:slug/detail — bundles everything the tabbed CompanyDetail
+// page needs: readiness (Overview tab), company-tagged coding problems
+// (Coding tab), CompanyQuestion rows (Technical tab), company-tagged HR
+// prompts (HR tab). Existing /companies/:slug/prep is kept for the Overview
+// tab which still consumes the richer prep payload.
+router.get('/:slug/detail', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const company = await prisma.company.findUnique({ where: { slug: req.params.slug } });
+    if (!company) return res.status(404).json({ error: 'Company not found' });
+
+    const [technical, coding, hr, solved] = await Promise.all([
+      prisma.companyQuestion.findMany({
+        where: { companyId: company.id },
+        orderBy: [{ subject: 'asc' }, { sortOrder: 'asc' }],
+      }),
+      prisma.codingProblem.findMany({
+        where: { companies: { has: company.slug }, verified: true },
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          difficulty: true,
+          track: true,
+          level: true,
+          topic: { select: { name: true, slug: true } },
+        },
+        orderBy: [{ level: 'asc' }, { title: 'asc' }],
+      }),
+      prisma.hrQuestion.findMany({
+        where: { companyTags: { has: company.slug } },
+        orderBy: [{ category: 'asc' }, { sortOrder: 'asc' }],
+      }),
+      prisma.userProblemStatus.findMany({
+        where: { userId: req.userId!, status: 'SOLVED' },
+        select: { problemId: true, bestScore: true },
+      }),
+    ]);
+
+    const solvedMap = new Map(solved.map((s) => [s.problemId, s.bestScore]));
+
+    // Group technical by subject for the tab UI.
+    const techBySubject: Record<string, typeof technical> = {};
+    for (const q of technical) {
+      const key = q.subject || 'OTHER';
+      (techBySubject[key] = techBySubject[key] || []).push(q);
+    }
+
+    return res.json({
+      company: {
+        id: company.id,
+        name: company.name,
+        slug: company.slug,
+        logoUrl: company.logoUrl,
+        notes: company.notes,
+      },
+      technical: {
+        total: technical.length,
+        bySubject: techBySubject,
+      },
+      coding: coding.map((p) => ({
+        ...p,
+        solved: solvedMap.has(p.id),
+        bestScore: solvedMap.get(p.id) ?? null,
+      })),
+      hr,
+    });
+  } catch (error) {
+    console.error('Company detail error:', error);
+    res.status(500).json({ error: 'Failed to load company detail' });
+  }
+});
+
 // GET /companies/:id/readiness — readiness index only (for widgets)
 router.get('/:id/readiness', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {

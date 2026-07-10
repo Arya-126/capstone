@@ -462,6 +462,26 @@ model Company {
 
   tests      AssessmentTest[]
   interviews AiInterview[]
+  questions  CompanyQuestion[]
+}
+
+// Company-specific TECHNICAL / SYSTEM_DESIGN interview questions (non-coding).
+// Concept-based prompts an interviewer might open a technical round with
+// ("What is virtual memory?", "Explain ACID"). Bank-style — not proctored.
+model CompanyQuestion {
+  id         String   @id @default(uuid())
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id])
+  category   String // TECHNICAL | SYSTEM_DESIGN
+  subject    String? // OS | DBMS | OOPS | CN | DSA | SYSTEM_DESIGN
+  question   String
+  answerHint String? // markdown: talking points / model answer
+  difficulty String   @default("medium") // easy | medium | hard
+  tags       String[] @default([]) // sub-topics (e.g. ["indexing","normalization"])
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([companyId, category])
 }
 
 model AssessmentTest {

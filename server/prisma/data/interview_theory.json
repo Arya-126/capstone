@@ -1,0 +1,222 @@
+[
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Percentages",
+    "slug": "percentages",
+    "rawTheory": "A percentage is a ratio expressed out of 100. The symbol % literally means 'per hundred'. To convert a fraction into a percentage, multiply by 100. To convert a percentage into a decimal, divide by 100. Percentages let us compare quantities on a common scale even when their raw values differ. If a shop marks a price up by 20 percent, the selling price is 120 percent of the cost. A percentage increase followed by an equal percentage decrease does NOT return the original value because the base changes between the two operations. Successive percentage changes combine using the formula a + b + (ab/100), where a positive value means an increase and a negative value means a decrease. When a quantity moves from an old value to a new value, the percent change equals (new minus old) divided by old, times 100. Percentage points and percent are different concepts. Moving from 30 percent to 35 percent is a rise of 5 percentage points but a rise of about 16.67 percent relative to the starting 30. Percentages are widely used in profit and loss, simple and compound interest, data interpretation, and mixture problems.",
+    "keyPoints": [
+      "Percent means per hundred, so 25 percent equals the fraction 25 divided by 100.",
+      "To convert a fraction to a percentage, multiply the fraction by 100.",
+      "Percentage change is defined as (new value minus old value) divided by the old value, times 100.",
+      "An increase of x percent followed by a decrease of x percent does NOT return the original value.",
+      "Successive percentage changes combine using the formula a + b + (a times b) divided by 100.",
+      "Percentage points measure absolute gap between two percentages; percent measures relative gap.",
+      "If the selling price is 120 percent of the cost, the profit is 20 percent of the cost."
+    ],
+    "formulas": [
+      "Percent = Part / Whole * 100",
+      "Percent change = (New - Old) / Old * 100",
+      "Combined change = a + b + a * b / 100",
+      "New value = Old value * (1 + r / 100)",
+      "Fraction = Percent / 100"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Profit and Loss",
+    "slug": "profit-and-loss",
+    "rawTheory": "In profit and loss problems, the cost price is the amount a seller pays to acquire an item, and the selling price is the amount received on sale. When the selling price is higher than the cost price, the difference is called profit; when it is lower, the difference is called loss. Profit percent and loss percent are always expressed with reference to the cost price. If a shopkeeper marks the goods above the cost and then offers a discount, the discount is calculated on the marked price rather than the cost price. Successive discounts combine multiplicatively: a discount of a percent followed by a discount of b percent leaves a fraction of (1 minus a/100) times (1 minus b/100) of the marked price. Break-even happens when the selling price equals the cost price, meaning zero profit and zero loss. When cost prices of two items are the same but one is sold at x percent profit and the other at x percent loss, the overall transaction results in a net loss of x squared divided by 100 percent.",
+    "keyPoints": [
+      "Profit equals selling price minus cost price when the selling price is higher.",
+      "Loss equals cost price minus selling price when the cost price is higher.",
+      "Profit percent and loss percent are computed on the cost price, not the selling price.",
+      "Discount is always calculated on the marked price, not the cost price.",
+      "Successive discounts multiply their retention factors, not their raw percentages.",
+      "Marked price equals cost price times a markup factor greater than one.",
+      "Equal percent profit and equal percent loss on two identical costs produces a net loss."
+    ],
+    "formulas": [
+      "Profit = Selling Price - Cost Price",
+      "Profit Percent = Profit / Cost Price * 100",
+      "Selling Price = Cost Price * (1 + Profit Percent / 100)",
+      "Discount = Marked Price - Selling Price",
+      "Discount Percent = Discount / Marked Price * 100"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Simple and Compound Interest",
+    "slug": "simple-and-compound-interest",
+    "rawTheory": "Interest is the extra amount paid or earned for using someone else's money over time. In simple interest, the interest for every period is computed on the original principal, so total interest grows linearly with time. In compound interest, interest for a period is added to the principal before the next period is computed, so total interest grows exponentially. The three basic quantities are the principal, the annual rate of interest, and the time in years. When the compounding frequency is more than once per year, split the rate by the number of periods and multiply the time by the same factor. For the same principal, rate, and duration, compound interest always yields more than simple interest whenever the duration is greater than one period. Compound interest is standard for bank deposits, credit cards, and long-term investments; simple interest still appears in short-term loans, promissory notes, and some government instruments.",
+    "keyPoints": [
+      "Simple interest grows linearly with time because it is always calculated on the original principal.",
+      "Compound interest grows exponentially because interest earns further interest each period.",
+      "Compound interest is always greater than simple interest for a duration longer than one period.",
+      "For quarterly compounding, use rate divided by four and time multiplied by four.",
+      "The effective annual rate can be higher than the stated rate when compounding is more frequent than yearly.",
+      "Doubling time under compound interest can be estimated using the rule of 72.",
+      "Loan amortization uses compound interest even when a payment schedule looks linear."
+    ],
+    "formulas": [
+      "Simple Interest = Principal * Rate * Time / 100",
+      "Amount (Simple) = Principal * (1 + Rate * Time / 100)",
+      "Amount (Compound) = Principal * (1 + Rate / 100) ^ Time",
+      "Compound Interest = Amount - Principal",
+      "Doubling Time ~ 72 / Rate"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Averages",
+    "slug": "averages",
+    "rawTheory": "The average of a set of numerical values is their sum divided by the count of values. It represents a central tendency and lets us compare distributions using a single number. The average is sensitive to extreme values, so a single outlier can shift it noticeably. When a new value is added to a set, the change in the average equals the difference between the new value and the old average, divided by the new count. The weighted average takes into account the relative importance of each value and is calculated by multiplying each value by its weight, summing the products, and dividing by the sum of the weights. The average of consecutive integers from one to n equals (n plus 1) divided by two. The average speed for a round trip covering equal distances at two different speeds is the harmonic mean of the two speeds, not the arithmetic mean.",
+    "keyPoints": [
+      "Average equals the sum of all values divided by the count of values.",
+      "The average is pulled toward extreme values in the set.",
+      "When one value is replaced, the average changes by (new minus removed) divided by the total count.",
+      "Weighted average uses weights to reflect the relative importance of each value.",
+      "Average of consecutive integers from one to n equals (n + 1) divided by 2.",
+      "Average speed for equal distances at two speeds is the harmonic mean, not the arithmetic mean.",
+      "The average of a symmetric distribution equals its middle value."
+    ],
+    "formulas": [
+      "Average = Sum of Values / Count of Values",
+      "Sum = Average * Count",
+      "New Average = Old Average + (New Value - Old Average) / New Count",
+      "Weighted Average = Sum of (Value * Weight) / Sum of Weights",
+      "Average Speed = 2 * S1 * S2 / (S1 + S2)"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Ratios and Proportions",
+    "slug": "ratios-and-proportions",
+    "rawTheory": "A ratio compares two quantities of the same kind by division. The ratio a to b is written as a colon b and simplified by dividing both parts by their greatest common divisor. A proportion is a statement that two ratios are equal, written a is to b as c is to d. In such a proportion, a and d are called the extremes and b and c are called the means; the product of the extremes equals the product of the means. If quantities vary directly, one increases as the other increases and their ratio remains constant. If quantities vary inversely, one increases as the other decreases and their product remains constant. Compound ratios are formed by multiplying the corresponding parts of two or more ratios. Ratios are the backbone of partnership problems, mixture problems, work-time problems, and unit conversion problems.",
+    "keyPoints": [
+      "A ratio compares two quantities of the same kind by division.",
+      "Proportion is an equality of two ratios and cross products are equal.",
+      "In a proportion a is to b as c is to d, the product a times d equals b times c.",
+      "Direct variation keeps the ratio constant; inverse variation keeps the product constant.",
+      "Compound ratio equals the product of individual ratios in matching order.",
+      "A ratio remains unchanged when both terms are multiplied or divided by the same non-zero value.",
+      "Partnership profits are shared in the ratio of investment multiplied by time."
+    ],
+    "formulas": [
+      "a : b = a / b",
+      "If a : b = c : d then a * d = b * c",
+      "Direct Variation: a / b = k",
+      "Inverse Variation: a * b = k",
+      "Compound Ratio: (a1 : b1) * (a2 : b2) = a1 * a2 : b1 * b2"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Time Speed and Distance",
+    "slug": "time-speed-and-distance",
+    "rawTheory": "The three quantities time, speed, and distance are linked by a single relationship: distance equals speed multiplied by time. If any two are known, the third can be found. When two moving bodies travel in the same direction their relative speed is the difference of their speeds; when they travel in opposite directions their relative speed is the sum. Trains crossing a stationary object cover a distance equal to their own length; trains crossing a moving object or another train cover a distance equal to the sum of the two relevant lengths, at their relative speed. For a boat moving downstream the effective speed is boat speed plus stream speed; upstream it is boat speed minus stream speed. Average speed for a round trip covering equal distances at two different speeds is given by the harmonic mean, not the simple arithmetic mean of the two speeds.",
+    "keyPoints": [
+      "Distance equals speed multiplied by time.",
+      "Speed increases as time to cover a fixed distance decreases.",
+      "Relative speed for same direction equals the difference between the two speeds.",
+      "Relative speed for opposite directions equals the sum of the two speeds.",
+      "A train crossing a platform covers the sum of its length and the platform length.",
+      "Downstream speed of a boat equals boat speed plus stream speed.",
+      "Upstream speed of a boat equals boat speed minus stream speed."
+    ],
+    "formulas": [
+      "Distance = Speed * Time",
+      "Speed = Distance / Time",
+      "Time = Distance / Speed",
+      "Average Speed = 2 * S1 * S2 / (S1 + S2)",
+      "Relative Speed (opposite) = S1 + S2",
+      "Downstream Speed = Boat + Stream"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Number System",
+    "slug": "number-system",
+    "rawTheory": "The number system underlies most quantitative reasoning. Natural numbers are the counting numbers starting from one. Whole numbers include zero along with the natural numbers. Integers include both positive and negative whole numbers and zero. Rational numbers are numbers that can be written as a ratio of two integers; irrational numbers cannot. Prime numbers have exactly two positive divisors, one and the number itself. Composite numbers have more than two positive divisors. The number one is neither prime nor composite. Every integer greater than one can be written uniquely as a product of prime powers, called its prime factorization. The highest common factor of two numbers is the largest number that divides both without remainder; the least common multiple is the smallest positive number that both divide without remainder. Divisibility tests give quick ways to check whether a number is divisible by small primes without performing the actual division.",
+    "keyPoints": [
+      "Natural numbers begin at one and continue indefinitely.",
+      "Whole numbers include zero and all natural numbers.",
+      "Integers include negatives, zero, and positives.",
+      "Rational numbers can be written as a ratio of two integers with a non-zero denominator.",
+      "A prime number has exactly two positive divisors: one and itself.",
+      "Every integer greater than one has a unique prime factorization.",
+      "HCF of two numbers times their LCM equals the product of the two numbers."
+    ],
+    "formulas": [
+      "HCF * LCM = Product of Two Numbers",
+      "Sum of first n natural numbers = n * (n + 1) / 2",
+      "Sum of squares from 1 to n = n * (n + 1) * (2n + 1) / 6",
+      "Sum of cubes from 1 to n = (n * (n + 1) / 2) ^ 2"
+    ]
+  },
+  {
+    "category": "quantitative-aptitude",
+    "topic": "Permutations and Combinations",
+    "slug": "permutations-and-combinations",
+    "rawTheory": "Permutations and combinations count the number of ways to arrange or select items from a set. A permutation counts arrangements where order matters, while a combination counts selections where order does not matter. When choosing r items from n distinct items and treating different orders as different outcomes, the count is n factorial divided by (n minus r) factorial. When order does not matter, the count is n factorial divided by r factorial times (n minus r) factorial. Factorial of a non-negative integer n, written n exclamation, is the product of all positive integers up to n. By convention zero factorial equals one. The multiplication principle says that if one task can be done in a ways and a second in b ways, the two tasks together can be done in a times b ways. The addition principle says that mutually exclusive alternatives combine by summing their counts.",
+    "keyPoints": [
+      "Permutation counts arrangements where order matters.",
+      "Combination counts selections where order does not matter.",
+      "Factorial of n is the product of all positive integers from 1 up to n.",
+      "Zero factorial is defined as one for consistency of formulas.",
+      "The multiplication principle multiplies counts of independent choices.",
+      "The addition principle adds counts of mutually exclusive alternatives.",
+      "Choosing r items out of n with order gives n! divided by (n minus r) factorial."
+    ],
+    "formulas": [
+      "n! = n * (n - 1) * (n - 2) * ... * 1",
+      "P(n, r) = n! / (n - r)!",
+      "C(n, r) = n! / (r! * (n - r)!)",
+      "C(n, r) = C(n, n - r)",
+      "0! = 1"
+    ]
+  },
+  {
+    "category": "logical-reasoning",
+    "topic": "Clocks",
+    "slug": "clocks",
+    "rawTheory": "A clock is a circle of 360 degrees divided into 12 equal sectors, so each hour occupies 30 degrees. The minute hand makes one full revolution every hour, covering 6 degrees per minute. The hour hand covers 30 degrees per hour, which is half a degree per minute. The two hands coincide exactly 11 times in every 12 hours, so on average they meet once every 65 and 5 by 11 minutes. In any 24 hour period they coincide 22 times. The hands are at right angles 22 times in 12 hours and at 180 degrees 11 times in 12 hours. The angle between the hour hand and the minute hand at time h hours and m minutes equals the absolute value of (30 h minus 11 m over 2). Clock problems usually reduce to computing this angle or the moments when it takes a specific value.",
+    "keyPoints": [
+      "The clock face is 360 degrees, divided into 12 sectors of 30 degrees each.",
+      "The minute hand moves 6 degrees per minute.",
+      "The hour hand moves half a degree per minute.",
+      "In every 12 hours the hands coincide 11 times.",
+      "In every 12 hours the hands are perpendicular 22 times.",
+      "In every 12 hours the hands are opposite 11 times.",
+      "The relative speed of the minute hand over the hour hand is 5.5 degrees per minute."
+    ],
+    "formulas": [
+      "Angle between hands = | 30 * H - 5.5 * M |",
+      "Minute hand speed = 6 degrees per minute",
+      "Hour hand speed = 0.5 degrees per minute",
+      "Time between overlaps = 720 / 11 minutes",
+      "Relative speed = 5.5 degrees per minute"
+    ]
+  },
+  {
+    "category": "logical-reasoning",
+    "topic": "Calendars",
+    "slug": "calendars",
+    "rawTheory": "A calendar problem asks about the day of the week for a given date. The Gregorian calendar has 365 days in an ordinary year and 366 days in a leap year. A year is a leap year if it is divisible by four, except for century years which must also be divisible by four hundred. An ordinary year has 52 complete weeks plus one extra day, so the day of the week advances by one for the same date in the next year. A leap year advances the day of the week by two. Over any 400 year block the total number of odd days is zero, so the calendar repeats exactly every 400 years. Zeller's congruence gives a direct formula for the day of the week from year, month, and day, but for aptitude tests it is usually faster to compute odd days from a reference date, keeping the count modulo seven.",
+    "keyPoints": [
+      "An ordinary year contains 365 days, a leap year contains 366 days.",
+      "A year is a leap year when divisible by 4, except centuries not divisible by 400.",
+      "An ordinary year advances the day of the week by one for the next same date.",
+      "A leap year advances the day of the week by two for the next same date.",
+      "Every 400 year block has zero net odd days, so the calendar repeats every 400 years.",
+      "January and October always share the same day of the week in ordinary years.",
+      "February and November also share the same day of the week in ordinary years."
+    ],
+    "formulas": [
+      "Odd days in ordinary year = 1",
+      "Odd days in leap year = 2",
+      "Odd days in 100 years = 5",
+      "Odd days in 400 years = 0",
+      "Day = (Total Odd Days) mod 7"
+    ]
+  }
+]
