@@ -5,14 +5,12 @@ import Groq from 'groq-sdk';
 // ANTHROPIC_API_KEY is set; otherwise Groq (llama-3.3-70b).
 
 const ANTHROPIC_MODEL = 'claude-opus-4-8';
-const GROQ_MODEL = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
-// Groq rate limits are per model — when the primary model's daily token quota
-// is exhausted, fall back to a model with its own quota instead of failing.
-const GROQ_FALLBACK_MODEL = process.env.GROQ_FALLBACK_MODEL || 'llama-3.1-8b-instant';
+const GROQ_MODEL = process.env.GROQ_MODEL || 'groq/compound';
+const GROQ_FALLBACK_MODEL = process.env.GROQ_FALLBACK_MODEL || 'groq/compound-mini';
 
 const useAnthropic = !!process.env.ANTHROPIC_API_KEY;
 const anthropic = useAnthropic ? new Anthropic() : null;
-const groq = !useAnthropic
+const groq = process.env.GROQ_API_KEY
   ? new Groq({ apiKey: process.env.GROQ_API_KEY, timeout: 60_000, maxRetries: 2 })
   : null;
 
@@ -30,25 +28,33 @@ export async function chat(
   const maxTokens = opts.maxTokens ?? 1024;
 
   if (anthropic) {
-    const system = messages.filter((m) => m.role === 'system').map((m) => m.content).join('\n\n');
-    const turns = messages
-      .filter((m) => m.role !== 'system')
-      .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
-    const response = await anthropic.messages.create({
-      model: ANTHROPIC_MODEL,
-      max_tokens: maxTokens,
-      thinking: { type: 'adaptive' },
-      ...(system ? { system } : {}),
-      messages: turns.length > 0 ? turns : [{ role: 'user', content: 'Begin.' }],
-    } as any);
-    return (response as any).content
-      .filter((b: any) => b.type === 'text')
-      .map((b: any) => b.text)
-      .join('');
+    try {
+      const system = messages.filter((m) => m.role === 'system').map((m) => m.content).join('\n\n');
+      const turns = messages
+        .filter((m) => m.role !== 'system')
+        .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+      const response = await anthropic.messages.create({
+        model: ANTHROPIC_MODEL,
+        max_tokens: maxTokens,
+        thinking: { type: 'adaptive' },
+        ...(system ? { system } : {}),
+        messages: turns.length > 0 ? turns : [{ role: 'user', content: 'Begin.' }],
+      } as any);
+      return (response as any).content
+        .filter((b: any) => b.type === 'text')
+        .map((b: any) => b.text)
+        .join('');
+    } catch (anthropicErr: any) {
+      console.warn(`llmService: Anthropic API error (${anthropicErr?.message || anthropicErr}), falling back to Groq`);
+      if (!groq) {
+        throw anthropicErr;
+      }
+    }
   }
 
   const groqCall = async (model: string) => {
-    const response = await groq!.chat.completions.create({
+    if (!groq) throw new Error('No valid LLM provider configured (Anthropic failed and GROQ_API_KEY is missing)');
+    const response = await groq.chat.completions.create({
       model,
       temperature: 0.4,
       max_tokens: maxTokens,
@@ -58,16 +64,20 @@ export async function chat(
     return response.choices[0]?.message?.content || '';
   };
 
-  try {
-    return await groqCall(GROQ_MODEL);
-  } catch (e: any) {
-    const msg = String(e?.message || '');
-    if ((e?.status === 429 || msg.includes('rate_limit')) && GROQ_FALLBACK_MODEL !== GROQ_MODEL) {
-      console.warn(`llmService: ${GROQ_MODEL} rate-limited, falling back to ${GROQ_FALLBACK_MODEL}`);
-      return await groqCall(GROQ_FALLBACK_MODEL);
+  const candidates = [GROQ_MODEL, GROQ_FALLBACK_MODEL, 'openai/gpt-oss-20b', 'llama-3.1-8b-instant'];
+  const tried = new Set<string>();
+
+  for (const model of candidates) {
+    if (tried.has(model)) continue;
+    tried.add(model);
+    try {
+      return await groqCall(model);
+    } catch (e: any) {
+      const msg = String(e?.message || '');
+      console.warn(`llmService: Groq model ${model} failed (${msg}), trying next candidate...`);
     }
-    throw e;
   }
+  throw new Error('All configured Groq models failed. Please verify your GROQ_API_KEY.');
 }
 
 // Defensive JSON extraction — tolerates code fences and surrounding prose.

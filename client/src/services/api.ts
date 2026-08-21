@@ -33,7 +33,12 @@ class ApiClient {
 
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw new Error(`API error: ${response.statusText}`);
+      // surface the server's { error } message instead of the bare status text
+      const message = await response
+        .json()
+        .then((data: any) => data?.error || data?.message)
+        .catch(() => null);
+      throw new Error(message || `API error: ${response.statusText}`);
     }
 
     return response.json() as Promise<T>;
@@ -54,7 +59,13 @@ class ApiClient {
       headers,
       body: JSON.stringify(body)
     });
-    if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+    if (!response.ok) {
+      const message = await response
+        .json()
+        .then((data: any) => data?.error || data?.message)
+        .catch(() => null);
+      throw new Error(message || `API error: ${response.statusText}`);
+    }
     return response.blob();
   }
 

@@ -32,10 +32,12 @@ const Avatar = getInterviewerAvatar();
 
 export const InterviewRoom: React.FC<{
   role: string;
+  roundType?: string;
   companyId?: string | null;
+  resumeData?: any;
   onExit: () => void;
   onComplete: (interviewId: string) => void;
-}> = ({ role, companyId, onExit, onComplete }) => {
+}> = ({ role, roundType = 'technical', companyId, resumeData, onExit, onComplete }) => {
   const [phase, setPhase] = useState<'consent' | 'room'>('consent');
   const [consentCam, setConsentCam] = useState(false);
   const [consentMic, setConsentMic] = useState(false);
@@ -240,7 +242,9 @@ export const InterviewRoom: React.FC<{
     try {
       const iv = await apiClient.post<Interview>('/ai-interview/start', {
         role,
+        roundType,
         ...(companyId ? { companyId } : {}),
+        ...(resumeData ? { resumeData } : {}),
       });
       setInterview(iv);
       setPhase('room');

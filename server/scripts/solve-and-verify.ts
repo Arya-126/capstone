@@ -19,7 +19,7 @@ import { prisma } from '../src/lib/prisma';
 // Resumable: questions with a proposedAnswer are skipped unless --redo is given.
 
 const ANTHROPIC_MODEL = 'claude-opus-4-8';
-const GEMINI_MODEL = 'gemini-2.0-flash';
+const GEMINI_MODEL = 'gemini-2.5-flash'; // 2.0-flash has zero free-tier quota on this key
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const LETTERS = ['A', 'B', 'C', 'D', 'E'];
 
@@ -116,18 +116,29 @@ interface SolveResult {
 }
 
 function parseAnswer(text: string): SolveResult | null {
-  try {
-    // tolerate code fences / surrounding prose around the JSON object
-    const match = text.match(/\{[\s\S]*\}/);
-    if (!match) return null;
-    const parsed = JSON.parse(match[0]);
-    if (typeof parsed.answer === 'string' && LETTERS.includes(parsed.answer.toUpperCase())) {
-      return { answer: parsed.answer.toUpperCase(), explanation: String(parsed.explanation || '') };
+  const tryParse = (s: string): SolveResult | null => {
+    try {
+      const parsed = JSON.parse(s);
+      if (typeof parsed.answer === 'string' && LETTERS.includes(parsed.answer.toUpperCase())) {
+        return { answer: parsed.answer.toUpperCase(), explanation: String(parsed.explanation || '') };
+      }
+    } catch {
+      /* not this candidate */
     }
-  } catch {
-    // fall through
+    return null;
+  };
+  // CoT responses put the JSON at the END after step-by-step reasoning — try
+  // the last '{"answer"' occurrence first, then fall back to the widest match
+  const idx = text.lastIndexOf('{"answer"');
+  if (idx >= 0) {
+    const end = text.indexOf('}', idx);
+    if (end > idx) {
+      const result = tryParse(text.slice(idx, end + 1));
+      if (result) return result;
+    }
   }
-  return null;
+  const wide = text.match(/\{[\s\S]*\}/);
+  return wide ? tryParse(wide[0]) : null;
 }
 
 async function solveOnce(prompt: string, framing: string, temperature = 0): Promise<SolveResult | null> {
@@ -149,17 +160,20 @@ async function solveOnce(prompt: string, framing: string, temperature = 0): Prom
   // Groq free tier: 12k tokens/min — retry 429s with the server-suggested delay
   for (let attempt = 0; attempt < 6; attempt++) {
     try {
+      // no response_format here: forcing pure JSON strips the model of its
+      // chain-of-thought and wrecks arithmetic accuracy — let it reason first,
+      // then emit the JSON at the end (parseAnswer extracts the last object)
       const response = await groq!.chat.completions.create({
         model: MODEL,
         temperature,
         max_tokens: 3000,
-        response_format: { type: 'json_object' },
         messages: [
           {
             role: 'system',
             content:
-              'You solve multiple-choice aptitude questions. Respond ONLY with a JSON object: ' +
-              '{"answer": "<letter A-E of the correct option>", "explanation": "<brief solution, max 4 sentences>"}',
+              'You solve multiple-choice aptitude questions. Work through the problem step by step, ' +
+              'showing your calculation. Then on the FINAL line output exactly: ' +
+              '{"answer": "<letter A-E of the correct option>", "explanation": "<your solution summarized in 2-3 sentences>"}',
           },
           { role: 'user', content: `${framing}\n\n${prompt}` },
         ],

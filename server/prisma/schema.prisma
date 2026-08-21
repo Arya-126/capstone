@@ -34,6 +34,11 @@ model User {
   friendRequests   Friendship[]     @relation("FriendRequests")
   friendOf         Friendship[]     @relation("FriendOf")
   problemStatuses  UserProblemStatus[]
+  quests           UserQuest[]
+  placementDrives  PlacementDrive[]
+  skillProfile     UserSkillProfile?
+  diagnosticAttempts DiagnosticAttempt[]
+  learningPipelines LearningPipeline[]
 }
 
 enum Role {
@@ -265,6 +270,11 @@ model InterviewQuestion {
   difficulty      String   @default("medium") // easy, medium, hard
   sourceRef       String?  // "The Aptitude Triad"
   createdAt       DateTime @default(now())
+  // false = quality scan flagged this question as broken (missing context,
+  // orphaned "A/B/…" references, PDF-parse artifacts). Read paths filter to
+  // isValid: true. Set by scripts/flag-invalid-aptitude.ts.
+  isValid         Boolean  @default(true)
+  invalidReason   String?
 }
 
 model InterviewTheory {
@@ -306,6 +316,7 @@ enum AssessmentCategory {
   LOGICAL
   VERBAL
   CODING
+  TECHNICAL
 }
 
 enum AssessmentQuestionType {
@@ -460,9 +471,10 @@ model Company {
   notes   String?
   profile Json? // pattern profile: topic weights, difficulty mix, round structure, interview style
 
-  tests      AssessmentTest[]
-  interviews AiInterview[]
-  questions  CompanyQuestion[]
+  tests           AssessmentTest[]
+  interviews      AiInterview[]
+  questions       CompanyQuestion[]
+  placementDrives PlacementDrive[]
 }
 
 // Company-specific TECHNICAL / SYSTEM_DESIGN interview questions (non-coding).
@@ -586,37 +598,57 @@ model ProctoringEvent {
 // Conversational AI interview — distinct from the InterviewCategory/InterviewTopic
 // MCQ prep module above.
 model AiInterview {
-  id           String            @id @default(uuid())
-  userId       String
-  user         User              @relation(fields: [userId], references: [id])
-  role         String // e.g. "SDE", "Backend"
-  companyId    String?
-  company      Company?          @relation(fields: [companyId], references: [id])
-  status       AiInterviewStatus @default(IN_PROGRESS)
-  startedAt    DateTime          @default(now())
-  endedAt      DateTime?
-  overallScore Float?
-  rubricScores Json? // { technical, communication, structure, problemSolving, roleFit } 0–5 each
-  summary      String?
-  proctoringSummary Json? // face-presence event counts from the video interview — signal, not verdict
-  deliverySignals   Json? // speech-delivery cues (avgWpm, totalFillers, per-answer) — informational, not scored
+  id                  String            @id @default(uuid())
+  userId              String
+  user                User              @relation(fields: [userId], references: [id])
+  role                String // e.g. "SDE", "Backend"
+  roundType           String            @default("technical") // "hr" | "technical" | "coding" | "full"
+  companyId           String?
+  company             Company?          @relation(fields: [companyId], references: [id])
+  status              AiInterviewStatus @default(IN_PROGRESS)
+  startedAt           DateTime          @default(now())
+  endedAt             DateTime?
+  overallScore        Float?
+  rubricScores        Json? // { technical, communication, structure, problemSolving, roleFit } 0–5 each
+  summary             String?
+  proctoringSummary   Json? // face-presence event counts from the video interview — signal, not verdict
+  deliverySignals     Json? // speech-delivery cues (avgWpm, totalFillers, per-answer) — informational, not scored
+  resumeData          Json? // extracted resume skills/projects/experience
+  selectedQuestionIds String[]          @default([])
 
-  turns AiInterviewTurn[]
+  turns     AiInterviewTurn[]
+  diagnosis InterviewDiagnosis?
 }
 
 model AiInterviewTurn {
-  id          String              @id @default(uuid())
-  interviewId String
-  interview   AiInterview         @relation(fields: [interviewId], references: [id], onDelete: Cascade)
-  role        AiInterviewTurnRole
-  content     String
-  audioUrl    String?
-  turnScore   Float?
-  feedback    String?
-  order       Int
-  isFollowup  Boolean             @default(false) // interviewer probe on the previous answer (doesn't consume the question budget)
+  id            String              @id @default(uuid())
+  interviewId   String
+  interview     AiInterview         @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  role          AiInterviewTurnRole
+  content       String
+  audioUrl      String?
+  turnScore     Float?
+  feedback      String?
+  starBreakdown Json? // STAR structure evaluation for HR round
+  order         Int
+  isFollowup    Boolean             @default(false) // interviewer probe on the previous answer (doesn't consume the question budget)
 
   @@index([interviewId, order])
+}
+
+// Core CS MCQ Question Bank (CN, OS, DBMS, SQL from data.json)
+model CoreSubjectQuestion {
+  id          String   @id @default(uuid())
+  subject     String // "CN", "OS", "DBMS", "SQL"
+  question    String
+  options     Json // string[]
+  answerIndex Int // 0-indexed correct answer
+  explanation String
+  difficulty  String   @default("medium")
+  tags        String[] @default([])
+  createdAt   DateTime @default(now())
+
+  @@index([subject])
 }
 
 // ===== SOCIAL & CONTESTS (Pillar D) =====
@@ -703,4 +735,131 @@ model HrQuestion {
   createdAt     DateTime @default(now())
 
   @@index([category])
+}
+
+// ===== UNIFIED DIAGNOSIS & AUTO-GENERATED QUESTS (Sprint 4) =====
+
+model InterviewDiagnosis {
+  id             String      @id @default(uuid())
+  interviewId    String      @unique
+  interview      AiInterview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+  weakAreas      Json?
+  strongAreas    Json?
+  topicMappings  Json?
+  overallVerdict String
+  createdAt      DateTime    @default(now())
+}
+
+model UserQuest {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  category    String   // "HR" | "TECH" | "CODING"
+  description String
+  milestones  Json     // [{ step: 1, text: "...", completed: false }]
+  xpReward    Int      @default(100)
+  status      String   @default("ACTIVE") // ACTIVE | COMPLETED
+  createdAt   DateTime @default(now())
+
+  @@index([userId, status])
+}
+
+model PlacementDrive {
+  id                String    @id @default(uuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyId         String?
+  company           Company?  @relation(fields: [companyId], references: [id])
+  resumeData        Json?
+  status            String    @default("IN_PROGRESS") // IN_PROGRESS | COMPLETED
+  currentStep       String    @default("resume") // resume | hr | technical | coding | report
+  hrInterviewId     String?
+  techInterviewId   String?
+  codingInterviewId String?
+  overallScore      Float?
+  overallVerdict    String?   // "Needs Practice" | "Almost Placement-Ready" | "Placement Ready"
+  startedAt         DateTime  @default(now())
+  completedAt       DateTime?
+
+  @@index([userId, status])
+}
+
+// ===== PERSONALIZED LEARNING PIPELINE =====
+// See plan.md "Plan Addendum: Personalized Learning Pipeline". A first-login
+// diagnostic populates UserSkillProfile, which drives generation of a
+// LearningPipeline of ordered PipelineStage rows with unlock gates.
+
+// One profile per user — levels 0-5, 0 = not yet diagnosed for that pillar.
+// Overall belt is derived from the average of the three diagnosed pillars.
+model UserSkillProfile {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  aptitudeLevel  Int       @default(0) // 0=undiagnosed, 1=Foundations..5=Advanced
+  coreCSLevel    Int       @default(0)
+  codingLevel    Int       @default(0)
+  commLevel      Int       @default(1) // starts at 1, grows from AI interview scores
+  overallBelt    String    @default("Unranked") // Unranked | Bronze | Silver | Gold | Platinum | Diamond
+  breakdown      Json?     // per-subtopic map — { "CN": 3, "OS": 2, "Arrays": 4, ... }
+  diagnosticAt   DateTime? // null until first diagnostic completes
+  lastRefreshAt  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Snapshot of a single diagnostic sitting. Kept for audit — retaking creates
+// a new row rather than mutating history, so we can chart improvement.
+model DiagnosticAttempt {
+  id              String    @id @default(uuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startedAt       DateTime  @default(now())
+  submittedAt     DateTime?
+  status          String    @default("IN_PROGRESS") // IN_PROGRESS | SUBMITTED | EXPIRED
+  itemsSnapshot   Json      // frozen question list at start (ids + kind + expected answers)
+  responses       Json?     // { qId: { chosenIndex, correct, timeMs } } | { coding: { passed, total } }
+  perPillarScores Json?     // { aptitude: 0.72, coreCS: 0.55, coding: 0.30 } 0..1
+  levelsAwarded   Json?     // { aptitude: 4, coreCS: 3, coding: 2 } 1-5
+
+  @@index([userId, status])
+}
+
+model LearningPipeline {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        String    @default("ACTIVE") // ACTIVE | COMPLETED | PAUSED
+  focus         String    @default("balanced") // "balanced" | "placement-6w" | "coding-only"
+  targetCompany String?   // optional slug — biases stage selection
+  createdAt     DateTime  @default(now())
+  completedAt   DateTime?
+
+  stages        PipelineStage[]
+
+  @@index([userId, status])
+}
+
+model PipelineStage {
+  id           String    @id @default(uuid())
+  pipelineId   String
+  pipeline     LearningPipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  order        Int       // 1..N — display + unlock order
+  pillar       String    // "aptitude" | "coreCS" | "coding" | "comm"
+  level        Int       // target level this stage moves the user toward (1-5)
+  title        String
+  description  String
+  gateType     String    // "quiz" | "coding-solve" | "interview" | "theory-read"
+  gateMeta     Json      // per gateType: { topicSlug, minScore, questionCount } | { problemIds, minSolved } etc.
+  isUnlocked   Boolean   @default(false) // true once previous stage completed
+  isCompleted  Boolean   @default(false)
+  // Skipped ≠ completed. A skipped stage stays in the pipeline as "missed"
+  // and the user can come back to complete it — only isCompleted counts as
+  // progress. isSkipped clears when the stage is later completed via a gate.
+  isSkipped    Boolean   @default(false)
+  skippedAt    DateTime?
+  completedAt  DateTime?
+
+  @@unique([pipelineId, order])
+  @@index([pipelineId, isCompleted])
 }

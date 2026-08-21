@@ -19,6 +19,12 @@ import friendsRoutes from './routes/friends';
 import contestsRoutes from './routes/contests';
 import codingTracksRoutes from './routes/codingTracks';
 import hrRoutes from './routes/hr';
+import coreSubjectRoutes from './routes/coreSubject';
+import questsRoutes from './routes/quests';
+import placementDriveRoutes from './routes/placementDrive';
+import prepTrackerRoutes from './routes/prepTracker';
+import diagnosticRoutes from './routes/diagnostic';
+import pipelineRoutes from './routes/pipeline';
 import { authMiddleware } from './middleware/auth';
 
 const app: Express = express();
@@ -48,6 +54,14 @@ app.use('/friends', friendsRoutes);
 app.use('/contests', contestsRoutes);
 app.use('/coding-tracks', codingTracksRoutes);
 app.use('/hr', hrRoutes);
+app.use('/core-subjects', coreSubjectRoutes);
+app.use('/quests', questsRoutes);
+app.use('/placement-drive', placementDriveRoutes);
+app.use('/prep-tracker', prepTrackerRoutes);
+// /diagnostic/start, /diagnostic/:id/submit, /diagnostic/profile
+app.use('/diagnostic', diagnosticRoutes);
+// /pipeline/current, /pipeline/create, /pipeline/:id/skip-stage/:stageId
+app.use('/pipeline', pipelineRoutes);
 
 // Root route
 app.get('/', (req, res) => {
