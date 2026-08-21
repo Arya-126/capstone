@@ -14,9 +14,14 @@ const SECTIONS: NavSection[] = [
   {
     title: 'Prep',
     items: [
+      { icon: '🎯', label: 'My Pipeline', page: 'pipeline' },
       { icon: '🏠', label: 'Home', page: 'interview-home' },
+      { icon: '🚀', label: 'Placement Drive', page: 'placement-drive' },
+      { icon: '📊', label: 'Prep Analytics', page: 'prep-tracker' },
+      { icon: '🎯', label: 'Active Quests', page: 'quests-hub' },
       { icon: '🧮', label: 'Aptitude', page: 'interview-hub' },
-      { icon: '💻', label: 'Coding', page: 'coding-tracks' },
+      { icon: '💻', label: 'Coding Tracks', page: 'coding-tracks' },
+      { icon: '📚', label: 'Core CS Drills', page: 'core-cs-hub' },
       { icon: '🏢', label: 'Companies & Mocks', page: 'assessments' },
       { icon: '🗣️', label: 'HR & Behavioral', page: 'hr-prep' },
       { icon: '🤖', label: 'AI Interview', page: 'ai-interview' },

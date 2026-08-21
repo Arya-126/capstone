@@ -4,6 +4,7 @@ import {
   startInterview,
   reply,
   finishInterview,
+  scoreCodingInterview,
   getInterview,
   listInterviews,
   recordProctoringSummary,
@@ -40,10 +41,29 @@ router.get('/', authMiddleware, async (req: AuthRequest, res: Response) => {
   }
 });
 
-// POST /ai-interview/start { role, companyId? }
+import { parseResumePdf } from '../services/resumeService';
+
+// POST /ai-interview/parse-resume { pdfBase64 }
+router.post('/parse-resume', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    const b64 = req.body?.pdfBase64;
+    if (!b64 || typeof b64 !== 'string') {
+      return res.status(400).json({ error: 'pdfBase64 string required' });
+    }
+    const cleanB64 = b64.replace(/^data:application\/pdf;base64,/, '');
+    const buffer = Buffer.from(cleanB64, 'base64');
+    const parsed = await parseResumePdf(buffer);
+    return res.json(parsed);
+  } catch (error: any) {
+    console.error('Resume parse error:', error);
+    return res.status(400).json({ error: error.message || 'Failed to parse resume PDF' });
+  }
+});
+
+// POST /ai-interview/start { role, companyId?, roundType?, resumeData? }
 router.post('/start', authMiddleware, async (req: AuthRequest, res: Response) => {
   try {
-    res.json(await startInterview(req.userId!, req.body?.role, req.body?.companyId));
+    res.json(await startInterview(req.userId!, req.body?.role, req.body?.companyId, req.body?.roundType, req.body?.resumeData));
   } catch (error: any) {
     console.error('Interview start error:', error);
     res.status(400).json({ error: error.message || 'Failed to start interview' });
@@ -57,6 +77,16 @@ router.post('/:id/reply', authMiddleware, async (req: AuthRequest, res: Response
   } catch (error: any) {
     console.error('Interview reply error:', error);
     res.status(400).json({ error: error.message || 'Failed to send answer' });
+  }
+});
+
+// POST /ai-interview/:id/score-coding { problemId, code, language, passed, total, elapsedMinutes }
+router.post('/:id/score-coding', authMiddleware, async (req: AuthRequest, res: Response) => {
+  try {
+    res.json(await scoreCodingInterview(req.params.id, req.userId!, req.body));
+  } catch (error: any) {
+    console.error('Coding score error:', error);
+    res.status(400).json({ error: error.message || 'Failed to score coding submission' });
   }
 });
 

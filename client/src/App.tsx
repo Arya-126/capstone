@@ -41,6 +41,15 @@ import { TestBuilder } from './pages/TestBuilder';
 import { AdminReports } from './pages/AdminReports';
 import { InterviewChat } from './pages/InterviewChat';
 import { InterviewRoom } from './pages/InterviewRoom';
+import { CoreCsHub } from './pages/CoreCsHub';
+import { CodingInterviewRoom } from './pages/CodingInterviewRoom';
+import { QuestHub } from './pages/QuestHub';
+import { PlacementDriveWizard } from './pages/PlacementDriveWizard';
+import { PrepTrackerDashboard } from './pages/PrepTrackerDashboard';
+import { DiagnosticIntro } from './pages/DiagnosticIntro';
+import { DiagnosticTest, DiagnosticResultPayload } from './pages/DiagnosticTest';
+import { DiagnosticResult } from './pages/DiagnosticResult';
+import { PipelinePage } from './pages/PipelinePage';
 
 interface User {
   id: string;
@@ -76,11 +85,16 @@ const App: React.FC = () => {
   const [selectedProblemSlug, setSelectedProblemSlug] = useState<string | null>(() => sessionStorage.getItem('selectedProblemSlug'));
   // which flow launched the current classic game — decides where quit/complete returns
   const [gameOrigin, setGameOrigin] = useState<'arcade' | 'interview'>(() => (sessionStorage.getItem('gameOrigin') as 'arcade' | 'interview') || 'arcade');
-  const [videoInterviewConfig, setVideoInterviewConfig] = useState<{ role: string; companyId: string | null } | null>(null);
+  const [videoInterviewConfig, setVideoInterviewConfig] = useState<{ role: string; companyId: string | null; roundType?: string; resumeData?: any } | null>(null);
+  const [codingInterviewConfig, setCodingInterviewConfig] = useState<{ role: string; companyId: string | null } | null>(null);
   const [completedInterviewId, setCompletedInterviewId] = useState<string | null>(null);
   const [selectedInterviewCategorySlug, setSelectedInterviewCategorySlug] = useState<string | null>(() => sessionStorage.getItem('selectedInterviewCategorySlug'));
   const [selectedInterviewTopicId, setSelectedInterviewTopicId] = useState<string | null>(() => sessionStorage.getItem('selectedInterviewTopicId'));
   const [achievementQueue, setAchievementQueue] = useState<any[]>([]);
+  // Diagnostic flow state — attemptId flows Intro → Test → Result; the result
+  // payload is stashed so DiagnosticResult can render without another API call.
+  const [diagnosticAttemptId, setDiagnosticAttemptId] = useState<string | null>(null);
+  const [diagnosticResult, setDiagnosticResult] = useState<DiagnosticResultPayload | null>(null);
 
   useEffect(() => {
     if (auth.token) {
@@ -124,6 +138,29 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Post-auth landing decision. First-time users (no UserSkillProfile row) get
+  // routed to the diagnostic intro; returning users go to interview-home as
+  // before. Failure to fetch is non-fatal — fall through to the old default.
+  const routeAfterAuth = async () => {
+    try {
+      const profile = await apiClient.get<any>('/diagnostic/profile');
+      if (profile && profile.diagnosticAt) {
+        // Returning user with a profile — try to land on their pipeline, but
+        // fall back to interview-home if they have no active pipeline.
+        try {
+          const pl = await apiClient.get<any>('/pipeline/current');
+          setCurrentPage(pl ? 'pipeline' : 'interview-home');
+        } catch {
+          setCurrentPage('interview-home');
+        }
+      } else {
+        setCurrentPage('diagnostic-intro');
+      }
+    } catch {
+      setCurrentPage('interview-home');
+    }
+  };
+
   const handleRegister = async (name: string, email: string, password: string, role: string) => {
     setError(null);
     setAuth({ ...auth, loading: true });
@@ -137,7 +174,7 @@ const App: React.FC = () => {
       localStorage.setItem('token', response.token);
       apiClient.setToken(response.token);
       setAuth({ user: response.user, token: response.token, loading: false });
-      setCurrentPage('interview-home');
+      await routeAfterAuth();
     } catch (error) {
       const msg = 'Registration failed. Please try again.';
       setError(msg);
@@ -154,7 +191,7 @@ const App: React.FC = () => {
       localStorage.setItem('token', response.token);
       apiClient.setToken(response.token);
       setAuth({ user: response.user, token: response.token, loading: false });
-      setCurrentPage('interview-home');
+      await routeAfterAuth();
     } catch (error) {
       const msg = 'Login failed. Please check your credentials.';
       setError(msg);
@@ -202,18 +239,30 @@ const App: React.FC = () => {
     setAchievementQueue(prev => prev.slice(1));
   };
 
+  // Pages that own the full viewport (their own chrome, no LearnHub nav/sidebar).
+  // Kept in one const so future immersive pages just append here.
+  const FULLSCREEN_PAGES = new Set([
+    'interview-room',
+    'coding-interview-room',
+    'diagnostic-test',
+  ]);
+  const isFullscreen = FULLSCREEN_PAGES.has(currentPage);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-slate-50 to-violet-100 relative">
       {/* Achievement Toasts */}
       {achievementQueue.length > 0 && (
-        <AchievementToast 
-          key={achievementQueue[0].id} 
-          achievement={achievementQueue[0]} 
-          onDismiss={dismissToast} 
+        <AchievementToast
+          key={achievementQueue[0].id}
+          achievement={achievementQueue[0]}
+          onDismiss={dismissToast}
         />
       )}
 
-      {/* Navigation */}
+      {/* Top navigation — hidden on fullscreen pages so the immersive room owns
+          the whole viewport (previously the sticky nav still bled through on
+          coding-interview-room and diagnostic-test). */}
+      {!isFullscreen && (
       <nav className="bg-white/80 backdrop-blur-md border-b border-gray-200/60 shadow-soft sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <button
@@ -272,9 +321,10 @@ const App: React.FC = () => {
           </div>
         </div>
       </nav>
+      )}
 
-      {/* Error Message */}
-      {error && (
+      {/* Error Message — hidden on fullscreen pages */}
+      {error && !isFullscreen && (
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 mt-4 rounded-xl shadow-soft animate-fade-in">
             <span className="text-lg">⚠️</span>
@@ -283,10 +333,11 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Page Content — persistent left nav for signed-in users (interview-first IA) */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex gap-6 items-start">
-          {auth.user && currentPage !== 'interview-room' && (
+      {/* Page Content — fullscreen pages skip the max-width wrapper AND the
+          sidebar so they truly own the viewport. */}
+      <div className={isFullscreen ? '' : 'max-w-7xl mx-auto px-4 py-8'}>
+        <div className={isFullscreen ? '' : 'flex gap-6 items-start'}>
+          {auth.user && !isFullscreen && (
             <LeftNav currentPage={currentPage} role={auth.user.role} onNavigate={(p) => { setCurrentPage(p); setError(null); }} />
           )}
           <main className="flex-1 min-w-0">
@@ -369,9 +420,16 @@ const App: React.FC = () => {
             onBack={() => setCurrentPage('interview-home')}
             onPracticeWithAI={(question) => {
               setCompletedInterviewId(null);
-              // free-text role seeds the interviewer prompt, so the session
-              // orients around this exact HR question — no backend change needed
-              setVideoInterviewConfig({ role: `HR round — practice this question: "${question.slice(0, 140)}"`, companyId: null });
+              // roundType: 'hr' is critical — without it the server picks the
+              // technical prompt + CoreSubjectQuestion bank instead of the
+              // HR prompt + HrQuestion bank. The role string embeds the
+              // target question so the {{role}} placeholder in hr-interviewer.md
+              // steers the opening question toward it.
+              setVideoInterviewConfig({
+                role: `HR round — practice this question: "${question.slice(0, 140)}"`,
+                companyId: null,
+                roundType: 'hr',
+              });
               setCurrentPage('interview-room');
             }}
           />
@@ -379,6 +437,56 @@ const App: React.FC = () => {
 
         {currentPage === 'dashboard' && auth.user && (
           <DashboardPage user={auth.user} setCurrentPage={setCurrentPage} />
+        )}
+
+        {currentPage === 'diagnostic-intro' && auth.user && (
+          <DiagnosticIntro
+            onStart={(attemptId) => {
+              setDiagnosticAttemptId(attemptId);
+              setDiagnosticResult(null);
+              setCurrentPage('diagnostic-test');
+            }}
+            onSkip={() => setCurrentPage('interview-home')}
+          />
+        )}
+
+        {currentPage === 'diagnostic-test' && auth.user && diagnosticAttemptId && (
+          <DiagnosticTest
+            attemptId={diagnosticAttemptId}
+            onComplete={(result) => {
+              setDiagnosticResult(result);
+              setCurrentPage('diagnostic-result');
+            }}
+            onAbort={() => {
+              setDiagnosticAttemptId(null);
+              setCurrentPage('interview-home');
+            }}
+          />
+        )}
+
+        {currentPage === 'diagnostic-result' && auth.user && diagnosticResult && (
+          <DiagnosticResult
+            result={diagnosticResult}
+            onContinue={() => {
+              setDiagnosticAttemptId(null);
+              setDiagnosticResult(null);
+              // Auto-generated pipeline should be waiting — land on it
+              setCurrentPage('pipeline');
+            }}
+          />
+        )}
+
+        {currentPage === 'pipeline' && auth.user && (
+          <PipelinePage
+            onNavigate={(page, ctx) => {
+              // ctx may seed context (subject, topicSlug, roundType, etc.) —
+              // stash the interesting bits in existing state slots so the
+              // target page can pick them up when it renders.
+              if (ctx?.categorySlug) setSelectedInterviewCategorySlug(ctx.categorySlug);
+              setCurrentPage(page);
+            }}
+            onNoDiagnostic={() => setCurrentPage('diagnostic-intro')}
+          />
         )}
 
         {/* DOMAIN HUB ROUTES */}
@@ -437,7 +545,9 @@ const App: React.FC = () => {
             onStartTest={(testId) => { setSelectedAssessmentId(testId); setCurrentPage('assessment-runner'); }}
             onStartInterview={(role, companyId) => {
               setCompletedInterviewId(null);
-              setVideoInterviewConfig({ role, companyId });
+              // company-pattern mocks are technical rounds — make it explicit
+              // rather than relying on the server's default fallback
+              setVideoInterviewConfig({ role, companyId, roundType: 'technical' });
               setCurrentPage('interview-room');
             }}
             onOpenProblem={(problemSlug) => { setSelectedProblemSlug(problemSlug); setCurrentPage('problem-solver'); }}
@@ -464,14 +574,38 @@ const App: React.FC = () => {
           <AdminReports onBack={() => setCurrentPage('dashboard')} />
         )}
 
+        {currentPage === 'core-cs-hub' && auth.user && (
+          <CoreCsHub onBack={() => setCurrentPage('dashboard')} />
+        )}
+
+        {currentPage === 'quests-hub' && auth.user && (
+          <QuestHub onNavigate={setCurrentPage} />
+        )}
+
+        {currentPage === 'placement-drive' && auth.user && (
+          <PlacementDriveWizard
+            onExit={() => setCurrentPage('dashboard')}
+            onNavigateQuests={() => setCurrentPage('quests-hub')}
+          />
+        )}
+
+        {currentPage === 'prep-tracker' && auth.user && (
+          <PrepTrackerDashboard onNavigate={setCurrentPage} />
+        )}
+
         {currentPage === 'ai-interview' && auth.user && (
           <InterviewChat
             onBack={() => { setCompletedInterviewId(null); setCurrentPage('dashboard'); }}
             initialInterviewId={completedInterviewId}
-            onStartVideo={(role, companyId) => {
+            onStartVideo={(role, companyId, roundType, resumeData) => {
               setCompletedInterviewId(null);
-              setVideoInterviewConfig({ role, companyId });
+              setVideoInterviewConfig({ role, companyId, roundType, resumeData });
               setCurrentPage('interview-room');
+            }}
+            onStartCoding={(role, companyId) => {
+              setCompletedInterviewId(null);
+              setCodingInterviewConfig({ role, companyId });
+              setCurrentPage('coding-interview-room');
             }}
           />
         )}
@@ -479,10 +613,25 @@ const App: React.FC = () => {
         {currentPage === 'interview-room' && auth.user && videoInterviewConfig && (
           <InterviewRoom
             role={videoInterviewConfig.role}
+            roundType={videoInterviewConfig.roundType}
             companyId={videoInterviewConfig.companyId}
+            resumeData={videoInterviewConfig.resumeData}
             onExit={() => { setVideoInterviewConfig(null); setCurrentPage('ai-interview'); }}
             onComplete={(interviewId) => {
               setVideoInterviewConfig(null);
+              setCompletedInterviewId(interviewId);
+              setCurrentPage('ai-interview');
+            }}
+          />
+        )}
+
+        {currentPage === 'coding-interview-room' && auth.user && codingInterviewConfig && (
+          <CodingInterviewRoom
+            role={codingInterviewConfig.role}
+            companyId={codingInterviewConfig.companyId}
+            onExit={() => { setCodingInterviewConfig(null); setCurrentPage('ai-interview'); }}
+            onComplete={(interviewId) => {
+              setCodingInterviewConfig(null);
               setCompletedInterviewId(interviewId);
               setCurrentPage('ai-interview');
             }}

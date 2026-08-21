@@ -7,6 +7,7 @@ import {
   runnerAvailable,
   LANGUAGES,
 } from '../services/codeRunnerService';
+import { checkPipelineGates } from '../services/pipelineService';
 
 const router = Router();
 
@@ -214,6 +215,26 @@ router.post('/submit', authMiddleware, rateLimit, async (req: AuthRequest, res: 
       });
     } catch (e) {
       console.warn('UserProblemStatus update failed (non-fatal):', e);
+    }
+
+    // Pipeline gate: coding-solve. Fires with topicSlug so stages tagged with
+    // a specific DSA topic can match. checkPipelineGates itself re-counts
+    // solved problems in that topic to enforce the minSolved threshold.
+    if (allPassed) {
+      try {
+        const problemWithTopic = await prisma.codingProblem.findUnique({
+          where: { id: problemId },
+          include: { topic: { select: { slug: true } } },
+        });
+        await checkPipelineGates(req.userId!, {
+          type: 'coding-solved',
+          problemId,
+          topicSlug: problemWithTopic?.topic?.slug,
+          allPassed: true,
+        });
+      } catch (e) {
+        console.warn('Pipeline gate check failed (non-fatal):', e);
+      }
     }
 
     // During a test attempt (Phase 4), persist the response server-side

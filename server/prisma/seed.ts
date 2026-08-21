@@ -255,6 +255,50 @@ async function seed() {
       console.log('⚠️ Skipping Interview Prep seeding: JSON files not found in Downloads folder.');
     }
 
+    // 4. Seed HR Questions
+    const hrQuestionsPath = path.join(__dirname, 'data', 'hr_questions.json');
+    if (fs.existsSync(hrQuestionsPath)) {
+      console.log('🌱 Seeding HR Questions...');
+      const hrData = JSON.parse(fs.readFileSync(hrQuestionsPath, 'utf8'));
+      await prisma.hrQuestion.deleteMany({});
+      await prisma.hrQuestion.createMany({
+        data: hrData.map((q: any) => ({
+          question: q.question,
+          category: q.category,
+          starGuidance: q.starGuidance,
+          sampleOutline: q.sampleOutline,
+          companyTags: q.companyTags || [],
+          sortOrder: q.sortOrder || 0,
+        })),
+      });
+      console.log(`✅ Seeded ${hrData.length} HR Questions`);
+    }
+
+    // 5. Seed Core Subject Questions (capstone/data.json — two dirs up from prisma/)
+    const dataJsonPath = path.join(__dirname, '..', '..', 'data.json');
+    if (fs.existsSync(dataJsonPath)) {
+      console.log('🌱 Seeding Core CS Questions (CN, OS, DBMS, SQL)...');
+      const coreData = JSON.parse(fs.readFileSync(dataJsonPath, 'utf8'));
+      await prisma.coreSubjectQuestion.deleteMany({});
+      let coreCount = 0;
+      for (const [subject, questions] of Object.entries<any[]>(coreData)) {
+        if (Array.isArray(questions)) {
+          await prisma.coreSubjectQuestion.createMany({
+            data: questions.map((q: any) => ({
+              subject,
+              question: q.q,
+              options: q.opts,
+              answerIndex: q.ans,
+              explanation: q.exp || '',
+              difficulty: 'medium',
+            })),
+          });
+          coreCount += questions.length;
+        }
+      }
+      console.log(`✅ Seeded ${coreCount} Core Subject Questions across CN, OS, DBMS, SQL`);
+    }
+
     console.log('🎉 Seeding complete!');
 
   } catch (error) {

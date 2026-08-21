@@ -1,0 +1,2551 @@
+{
+  "CN": [
+    {
+      "q": "In a star topology, what is the single point of failure?",
+      "opts": [
+        "Any one cable segment",
+        "The central device (hub/switch)",
+        "The end nodes",
+        "There is no single point of failure"
+      ],
+      "ans": 1,
+      "exp": "If the central device fails, the entire star network fails; a single cable failure only disconnects one node."
+    },
+    {
+      "q": "Which topology forms a single continuous path with no central server, used in SONET/SDH networks?",
+      "opts": [
+        "Bus",
+        "Mesh",
+        "Ring",
+        "Tree"
+      ],
+      "ans": 2,
+      "exp": "Ring topology connects each node to exactly two neighbours forming a continuous loop; SONET and SDH are classic examples."
+    },
+    {
+      "q": "A fully connected mesh of n nodes requires how many point-to-point links?",
+      "opts": [
+        "n",
+        "n-1",
+        "n(n-1)/2",
+        "n^2"
+      ],
+      "ans": 2,
+      "exp": "Each node connects to every other node: nC2 = n(n-1)/2 links, which is why mesh cabling cost is high."
+    },
+    {
+      "q": "Tree topology is best described as a combination of which two topologies?",
+      "opts": [
+        "Star and ring",
+        "Star and bus",
+        "Bus and mesh",
+        "Ring and mesh"
+      ],
+      "ans": 1,
+      "exp": "Tree (expanded star) topology connects multiple star networks to a single backbone bus, typically using Ethernet."
+    },
+    {
+      "q": "In bus topology, when a device transmits data, the data is:",
+      "opts": [
+        "Sent only to the recipient's port",
+        "Sent to all devices attached to the bus",
+        "Sent to the central hub only",
+        "Buffered in the bus controller"
+      ],
+      "ans": 1,
+      "exp": "The bus is a shared communication medium; the transmitted signal reaches every attached device, which then discards it if not addressed to itself."
+    },
+    {
+      "q": "What is the main drawback of a bus topology?",
+      "opts": [
+        "Requires a central switch",
+        "Cannot handle broadcast traffic",
+        "If the bus is damaged, the whole network fails",
+        "Cabling cost is very high"
+      ],
+      "ans": 2,
+      "exp": "The central cable is a single point of failure; any damage to the bus brings down the entire network."
+    },
+    {
+      "q": "Mesh topology has two variants. Which is correct?",
+      "opts": [
+        "Fully and partially connected mesh",
+        "Star mesh and bus mesh",
+        "Wired and wireless mesh",
+        "Rooted and rootless mesh"
+      ],
+      "ans": 0,
+      "exp": "Fully connected mesh: every node connected to every other. Partially connected mesh: not all pairs are directly linked."
+    },
+    {
+      "q": "Which topology results when a star topology is connected to a different topology?",
+      "opts": [
+        "Extended star",
+        "Hybrid",
+        "Mesh",
+        "Tree"
+      ],
+      "ans": 1,
+      "exp": "Combining different topologies produces a hybrid topology; joining two star topologies just yields another star."
+    },
+    {
+      "q": "If the 'main bus' in a tree topology breaks:",
+      "opts": [
+        "Only leaf nodes are affected",
+        "Only the root star is affected",
+        "The whole network gets damaged",
+        "Traffic is automatically rerouted"
+      ],
+      "ans": 2,
+      "exp": "Tree topology depends on the main bus/backbone; damage to it brings the whole network down."
+    },
+    {
+      "q": "Which network type would connect branch offices of a company across cities of a country?",
+      "opts": [
+        "LAN",
+        "MAN",
+        "WAN",
+        "PAN"
+      ],
+      "ans": 2,
+      "exp": "A WAN spans wide geographical areas such as cities and countries; a MAN is limited to a single metropolitan city."
+    },
+    {
+      "q": "What is the approximate range limit of a PAN (Personal Area Network)?",
+      "opts": [
+        "Up to 10 metres",
+        "Up to 100 metres",
+        "Up to 1 kilometre",
+        "Up to 10 kilometres"
+      ],
+      "ans": 0,
+      "exp": "A PAN's range limit is roughly 10 metres — Bluetooth-style personal device networks."
+    },
+    {
+      "q": "A CAN (Campus Area Network) is best described as:",
+      "opts": [
+        "A network within a single building",
+        "A connection of devices within a campus linking multiple departments",
+        "A country-wide backbone",
+        "A satellite-based network"
+      ],
+      "ans": 1,
+      "exp": "A CAN links devices across a campus area (e.g., a university) covering multiple departments/buildings."
+    },
+    {
+      "q": "Which network uses satellites to connect devices over the global area?",
+      "opts": [
+        "WAN",
+        "MAN",
+        "GAN",
+        "VPN"
+      ],
+      "ans": 2,
+      "exp": "A GAN (Global Area Network) uses satellite links to provide worldwide connectivity."
+    },
+    {
+      "q": "A HAN (House Area Network) is essentially:",
+      "opts": [
+        "A satellite home service",
+        "A LAN used within a house to connect home devices",
+        "A branch of a WAN",
+        "A wireless PAN only"
+      ],
+      "ans": 1,
+      "exp": "A HAN is a LAN restricted to household use, connecting PCs, printers, phones and other home devices."
+    },
+    {
+      "q": "A VPN is best described as:",
+      "opts": [
+        "A private LAN with encrypted switches",
+        "A private WAN built over the public internet using a secure tunnel",
+        "A firewall configuration",
+        "A dedicated leased line between offices"
+      ],
+      "ans": 1,
+      "exp": "A VPN creates a secure, encrypted tunnel across the public internet, giving remote users/offices private-network access cheaply compared to dedicated WAN links."
+    },
+    {
+      "q": "Which VPN type is intended for remote/mobile individual employees rather than connecting whole office networks?",
+      "opts": [
+        "Site-to-Site VPN",
+        "Intranet VPN",
+        "Extranet VPN",
+        "Access VPN"
+      ],
+      "ans": 3,
+      "exp": "Access (remote-access) VPN serves telecommuters and mobile users; Site-to-Site (Intranet/Extranet) links entire office networks."
+    },
+    {
+      "q": "An Intranet VPN is used to:",
+      "opts": [
+        "Connect an organisation to its customers securely",
+        "Connect remote offices in different geographical locations using shared infrastructure with the same policies as a private WAN",
+        "Provide dial-up connectivity",
+        "Encrypt internal LAN traffic only"
+      ],
+      "ans": 1,
+      "exp": "Intranet VPN links remote offices of the same organisation via shared infrastructure, giving them WAN-like unified accessibility policies."
+    },
+    {
+      "q": "An Extranet VPN differs from an Intranet VPN because it:",
+      "opts": [
+        "Uses no encryption",
+        "Connects the organisation with external partners, suppliers, or customers via dedicated connections",
+        "Runs only on satellite links",
+        "Is limited to a single building"
+      ],
+      "ans": 1,
+      "exp": "Extranet VPNs extend the intranet infrastructure to external stakeholders using dedicated, controlled connections."
+    },
+    {
+      "q": "An IPv4 address is how many bits long, arranged as how many octets?",
+      "opts": [
+        "16 bits, 2 octets",
+        "32 bits, 4 octets",
+        "64 bits, 8 octets",
+        "128 bits, 16 octets"
+      ],
+      "ans": 1,
+      "exp": "IPv4 addresses are 32-bit values written as four 8-bit octets (each 0–255)."
+    },
+    {
+      "q": "The IPv4 address 200.45.10.9 belongs to which class?",
+      "opts": [
+        "Class A",
+        "Class B",
+        "Class C",
+        "Class D"
+      ],
+      "ans": 2,
+      "exp": "Class C spans 192.0.0.0 – 223.255.255.255; used for local area networks."
+    },
+    {
+      "q": "Which IPv4 class is reserved for multicasting?",
+      "opts": [
+        "Class B",
+        "Class C",
+        "Class D",
+        "Class E"
+      ],
+      "ans": 2,
+      "exp": "Class D (224.0.0.0 – 239.255.255.255) is reserved for multicast; Class E is kept for study/R&D."
+    },
+    {
+      "q": "Which range covers Class A IPv4 addresses?",
+      "opts": [
+        "0.0.0.0 – 127.255.255.255",
+        "128.0.0.0 – 191.255.255.255",
+        "192.0.0.0 – 223.255.255.255",
+        "240.0.0.0 – 255.255.255.254"
+      ],
+      "ans": 0,
+      "exp": "Class A: 0.0.0.0 to 127.255.255.255, used for very large networks."
+    },
+    {
+      "q": "Which statement about public vs private IP addresses is correct?",
+      "opts": [
+        "Private IPs are routable on the internet directly",
+        "Public IPs are assigned by the ISP and used on the internet; private IPs are not valid on the internet without NAT/proxy",
+        "Public and private IPs are interchangeable",
+        "Private IPs are only IPv6"
+      ],
+      "ans": 1,
+      "exp": "Public IPs come from the ISP and are internet-routable; private IPs need NAT or a proxy to reach the internet."
+    },
+    {
+      "q": "Which OSI layer converts data into frames, attaches MAC addresses, and performs flow/error control on a link?",
+      "opts": [
+        "Physical",
+        "Data link",
+        "Network",
+        "Transport"
+      ],
+      "ans": 1,
+      "exp": "Framing, physical addressing, flow control, error control and link management are data-link-layer functions."
+    },
+    {
+      "q": "Routing, logical addressing, packetizing and fragmentation are functions of which OSI layer?",
+      "opts": [
+        "Data link",
+        "Network",
+        "Transport",
+        "Session"
+      ],
+      "ans": 1,
+      "exp": "The network layer determines the best source-to-destination route, assigns logical (IP) addresses, packetizes data and fragments packets."
+    },
+    {
+      "q": "Which OSI layer is called the 'Translation layer' and handles data compression and encryption?",
+      "opts": [
+        "Session",
+        "Presentation",
+        "Application",
+        "Transport"
+      ],
+      "ans": 1,
+      "exp": "The presentation layer translates between application format and common network format, and handles character code translation, compression and encryption."
+    },
+    {
+      "q": "Which OSI layer transmits the raw bitstream over a physical medium?",
+      "opts": [
+        "Physical",
+        "Data link",
+        "Network",
+        "Application"
+      ],
+      "ans": 0,
+      "exp": "The physical layer is the lowest layer, handling unstructured raw-bit transmission over cables/wireless media."
+    },
+    {
+      "q": "Beginning, maintaining and ending communication sessions between devices is the job of which layer?",
+      "opts": [
+        "Transport",
+        "Session",
+        "Presentation",
+        "Application"
+      ],
+      "ans": 1,
+      "exp": "The session layer establishes, maintains and terminates sessions between users, and reports errors from upper layers."
+    },
+    {
+      "q": "A connection-oriented transmission where the receiver sends an acknowledgement is provided by which OSI layer?",
+      "opts": [
+        "Data link",
+        "Network",
+        "Transport",
+        "Session"
+      ],
+      "ans": 2,
+      "exp": "The transport layer offers both connection-oriented (ack-based) and connectionless services and handles end-to-end error checking."
+    },
+    {
+      "q": "The application layer of OSI enables the user to access the network. Which is a valid application-layer protocol?",
+      "opts": [
+        "ARP",
+        "Ethernet",
+        "HTTP",
+        "IP"
+      ],
+      "ans": 2,
+      "exp": "HTTP, SMTP, DNS, FTP are all application-layer protocols; ARP is network-layer-adjacent, Ethernet is data-link, IP is network."
+    },
+    {
+      "q": "The TCP/IP reference model has how many layers, and which layer 'holds the architecture together' by delivering IP packets?",
+      "opts": [
+        "4 layers; Internet layer",
+        "4 layers; Transport layer",
+        "5 layers; Network layer",
+        "7 layers; Network layer"
+      ],
+      "ans": 0,
+      "exp": "TCP/IP has 4 layers (Link, Internet, Transport, Application); the Internet layer (IP, ICMP) delivers packets end-to-end."
+    },
+    {
+      "q": "In the TCP/IP model, which layer decides which physical links (e.g., serial lines, Ethernet) meet the needs of the connectionless internet layer?",
+      "opts": [
+        "Link layer",
+        "Internet layer",
+        "Transport layer",
+        "Application layer"
+      ],
+      "ans": 0,
+      "exp": "The Link layer chooses link technology (Ethernet, Sonet, etc.) to satisfy the connectionless Internet layer above it."
+    },
+    {
+      "q": "Which statement about HTTP vs HTTPS is correct?",
+      "opts": [
+        "HTTP uses port 443; HTTPS uses port 80",
+        "HTTPS adds SSL/TLS on top of HTTP and uses port 443 by default",
+        "HTTP is stateful; HTTPS is stateless",
+        "HTTPS works over UDP for speed"
+      ],
+      "ans": 1,
+      "exp": "HTTPS is HTTP secured with SSL/TLS encryption, default port 443; plain HTTP is a stateless application-layer protocol on port 80."
+    },
+    {
+      "q": "HTTP is called a 'stateless protocol' because:",
+      "opts": [
+        "It cannot carry data",
+        "Each command is independent of previous commands",
+        "It cannot use TCP",
+        "It cannot handle cookies"
+      ],
+      "ans": 1,
+      "exp": "Stateless means the server treats every HTTP command as unrelated to earlier ones; state must be added externally (e.g., cookies)."
+    },
+    {
+      "q": "What does DNS primarily do?",
+      "opts": [
+        "Assigns IP addresses dynamically to hosts",
+        "Maps domain names to their IP addresses",
+        "Encrypts traffic between browser and server",
+        "Routes packets between autonomous systems"
+      ],
+      "ans": 1,
+      "exp": "DNS resolves human-readable domain names into IP addresses. Dynamic IP assignment is DHCP's job."
+    },
+    {
+      "q": "A DNS forwarder is used when:",
+      "opts": [
+        "A client wants to bypass DNS caching",
+        "A DNS server forwards queries it cannot resolve to external DNS servers",
+        "A router converts MAC to IP addresses",
+        "A server load-balances HTTP requests"
+      ],
+      "ans": 1,
+      "exp": "A forwarder-configured DNS server passes unresolvable queries to external DNS servers for resolution."
+    },
+    {
+      "q": "Which underlying transport does DNS typically use for its lookups?",
+      "opts": [
+        "TCP only",
+        "UDP for standard queries",
+        "ICMP",
+        "SCTP"
+      ],
+      "ans": 1,
+      "exp": "DNS uses UDP for the vast majority of queries (fast, connectionless) and falls back to TCP for large responses/zone transfers."
+    },
+    {
+      "q": "SMTP listens on which port, and what is it used for?",
+      "opts": [
+        "Port 21; file transfer",
+        "Port 25; transmitting email between servers",
+        "Port 53; name resolution",
+        "Port 110; receiving email on client"
+      ],
+      "ans": 1,
+      "exp": "SMTP (Simple Mail Transfer Protocol) governs email transmission and is always listening on port 25."
+    },
+    {
+      "q": "SMTP supports which two delivery methods?",
+      "opts": [
+        "Push and pull",
+        "End-to-End and Store-and-Forward",
+        "Circuit-switched and packet-switched",
+        "Best-effort and reliable"
+      ],
+      "ans": 1,
+      "exp": "SMTP supports both End-to-End (direct) and Store-and-Forward (via intermediate servers) email delivery."
+    },
+    {
+      "q": "POP3 is responsible for:",
+      "opts": [
+        "Sending mail between servers",
+        "Accessing the mail service on a client machine",
+        "Encrypting mail in transit",
+        "Routing mail through DNS"
+      ],
+      "ans": 1,
+      "exp": "POP3 (Post Office Protocol v3) handles retrieving mail to a client machine, operating in Delete or Keep modes."
+    },
+    {
+      "q": "Which is a key difference between TCP and UDP?",
+      "opts": [
+        "UDP is connection-oriented; TCP is connectionless",
+        "TCP retransmits lost packets; UDP does not",
+        "UDP provides flow control and acknowledgements",
+        "TCP is faster than UDP"
+      ],
+      "ans": 1,
+      "exp": "TCP is connection-oriented with error checking, ACKs, flow control and retransmission; UDP is faster, simpler, and connectionless."
+    },
+    {
+      "q": "Which protocol does 'basic checksum-only' error checking?",
+      "opts": [
+        "TCP",
+        "UDP",
+        "SMTP",
+        "HTTP"
+      ],
+      "ans": 1,
+      "exp": "UDP has only checksum-based error detection; TCP performs extensive error checking with retransmissions and flow control."
+    },
+    {
+      "q": "Which protocol auto-assigns IP addresses and other network configuration to devices?",
+      "opts": [
+        "ARP",
+        "DHCP",
+        "DNS",
+        "ICMP"
+      ],
+      "ans": 1,
+      "exp": "DHCP (application layer) auto-configures IP, subnet mask and DNS details for hosts (default port 67)."
+    },
+    {
+      "q": "ARP is used to:",
+      "opts": [
+        "Map an IP address to a MAC address",
+        "Map a MAC address to an IP address",
+        "Find the best route using hop count",
+        "Report network-layer errors"
+      ],
+      "ans": 0,
+      "exp": "Address Resolution Protocol converts a logical (IP) address into the device's physical (MAC) address on the local network."
+    },
+    {
+      "q": "Which protocol is primarily used for error handling and diagnostics (e.g., 'ping')?",
+      "opts": [
+        "ARP",
+        "ICMP",
+        "RIP",
+        "FTP"
+      ],
+      "ans": 1,
+      "exp": "ICMP (Internet Control Message Protocol) is a network-layer protocol used by routers for error reporting and connectivity diagnostics."
+    },
+    {
+      "q": "RIP (Routing Information Protocol) selects the best route based on:",
+      "opts": [
+        "Bandwidth",
+        "Link delay",
+        "Hop count",
+        "Packet loss"
+      ],
+      "ans": 2,
+      "exp": "RIP is a dynamic routing protocol that uses hop-count as its metric; suited to small/medium networks."
+    },
+    {
+      "q": "FTP is used to:",
+      "opts": [
+        "Send email",
+        "Transfer files reliably between hosts",
+        "Look up domain names",
+        "Assign IP addresses"
+      ],
+      "ans": 1,
+      "exp": "FTP (File Transfer Protocol) is an application-layer protocol for reliable, efficient file transfer, including downloads from remote servers."
+    },
+    {
+      "q": "Which statement about MAC and IP addresses is correct?",
+      "opts": [
+        "Both are assigned by the ISP",
+        "MAC identifies the physical device (from the NIC manufacturer); IP identifies the network connection (from the ISP)",
+        "MAC changes with every network; IP is permanent",
+        "IP is a 48-bit hardware address"
+      ],
+      "ans": 1,
+      "exp": "NIC manufacturers assign MAC addresses (hardware identity); ISPs assign IP addresses (network identity)."
+    },
+    {
+      "q": "Hub vs switch — which is correct?",
+      "opts": [
+        "Hub is data-link and filters packets",
+        "Switch is physical and broadcasts to all ports",
+        "Hub is physical with no packet filtering; switch is data-link with packet filtering",
+        "Both operate at the network layer"
+      ],
+      "ans": 2,
+      "exp": "A hub blindly repeats signals to every port (physical layer, no filtering); a switch is a full-duplex data-link-layer device that filters and forwards frames per port."
+    },
+    {
+      "q": "A node that connects two or more networks and forwards messages between them is called:",
+      "opts": [
+        "Repeater",
+        "Bridge",
+        "Gateway/router",
+        "Modem"
+      ],
+      "ans": 2,
+      "exp": "Gateways/routers connect different networks, regulating and forwarding traffic between them."
+    },
+    {
+      "q": "A NIC (Network Interface Card):",
+      "opts": [
+        "Is a router",
+        "Is a peripheral card that attaches a PC to a network and has its own MAC address",
+        "Is a software firewall",
+        "Is a DNS server"
+      ],
+      "ans": 1,
+      "exp": "A NIC connects a PC to a network and carries a unique MAC address identifying that PC on the network."
+    },
+    {
+      "q": "When you type google.com, what happens immediately after the OS resolves the IP via DNS?",
+      "opts": [
+        "The browser renders the cached page",
+        "An HTTP request is sent without any connection",
+        "A TCP connection is established with the server using a three-way handshake",
+        "The server pushes the page via UDP"
+      ],
+      "ans": 2,
+      "exp": "After DNS resolution: TCP three-way handshake → HTTP request → HTTP response → render (and cache if cacheable)."
+    },
+    {
+      "q": "Which delivery method targets a subset of nodes with the same data (used to send data to multiple selected receivers)?",
+      "opts": [
+        "Unicast",
+        "Anycast",
+        "Multicast",
+        "Broadcast"
+      ],
+      "ans": 2,
+      "exp": "Multicast targets a subset of receivers. Unicast: one node; anycast: any one of several servers; broadcast: all nodes."
+    },
+    {
+      "q": "Which delivery method sends data to any one of several servers (used by CDNs)?",
+      "opts": [
+        "Unicast",
+        "Anycast",
+        "Multicast",
+        "Broadcast"
+      ],
+      "ans": 1,
+      "exp": "Anycast routes traffic to the topologically nearest instance among several, commonly used by CDNs and DNS root servers."
+    },
+    {
+      "q": "A firewall's role is to:",
+      "opts": [
+        "Assign IP addresses",
+        "Monitor incoming/outgoing traffic and block based on security policies",
+        "Compress network packets",
+        "Route between VLANs only"
+      ],
+      "ans": 1,
+      "exp": "A firewall (hardware, software, or both) sits between a private network and the public internet, enforcing security policies."
+    },
+    {
+      "q": "VPN encrypts internet traffic to:",
+      "opts": [
+        "Increase raw speed",
+        "Disguise online identity and protect confidentiality",
+        "Reduce packet loss",
+        "Improve DNS lookups"
+      ],
+      "ans": 1,
+      "exp": "A VPN protects confidentiality and hides the user's real IP/identity; it does not inherently increase throughput."
+    },
+    {
+      "q": "Which are the elements of a protocol?",
+      "opts": [
+        "Syntax, semantics, timing",
+        "Header, body, footer",
+        "Encoding, error correction, addressing",
+        "Encryption, integrity, availability"
+      ],
+      "ans": 0,
+      "exp": "A protocol is defined by syntax (format), semantics (meaning), and timing (when/how fast data is sent)."
+    },
+    {
+      "q": "Network reliability is measured by all of these EXCEPT:",
+      "opts": [
+        "Downtime",
+        "Failure frequency",
+        "Catastrophe handling",
+        "Colour of the cabling"
+      ],
+      "ans": 3,
+      "exp": "Reliability metrics per the notes: downtime (recovery time), failure frequency, and catastrophe robustness."
+    },
+    {
+      "q": "Subnetting a network is done primarily to:",
+      "opts": [
+        "Reduce hardware cost",
+        "Achieve higher routing efficiency and enhance security",
+        "Force devices to use IPv6",
+        "Speed up ARP resolutions"
+      ],
+      "ans": 1,
+      "exp": "Subnetting divides a network into subnets, improving routing efficiency and security, and reducing routing-table lookup time."
+    },
+    {
+      "q": "Netstat is a utility that:",
+      "opts": [
+        "Configures IP addresses",
+        "Shows current TCP/IP connections and settings",
+        "Encrypts traffic",
+        "Restarts network interfaces"
+      ],
+      "ans": 1,
+      "exp": "Netstat is a command-line utility providing useful information about the current TCP/IP setting and active connections."
+    },
+    {
+      "q": "Which command is used on Linux/UNIX/macOS to view and configure network interfaces?",
+      "opts": [
+        "ipconfig",
+        "ifconfig",
+        "tracert",
+        "ping"
+      ],
+      "ans": 1,
+      "exp": "ifconfig (Interface Configuration) is used on Linux/UNIX/macOS; ipconfig is the Windows equivalent."
+    },
+    {
+      "q": "RAID stands for:",
+      "opts": [
+        "Random Access Independent Disks",
+        "Redundant Array of Independent Disks",
+        "Reliable Array of Integrated Devices",
+        "Redundant Access to Internal Data"
+      ],
+      "ans": 1,
+      "exp": "RAID = Redundant Array of Independent Disks — stores data redundantly across multiple drives for performance/fault tolerance (7 levels)."
+    }
+  ],
+  "OS": [
+    {
+      "q": "An operating system is best defined as:",
+      "opts": [
+        "Application software for productivity tasks",
+        "An interface between the user/applications and hardware, managing resources",
+        "A database management system",
+        "A network protocol suite"
+      ],
+      "ans": 1,
+      "exp": "The OS is the interface between users/applications and hardware, responsible for process execution, resource allocation, CPU, file and memory management."
+    },
+    {
+      "q": "In which OS type does the CPU switch to another job whenever the running process waits for I/O?",
+      "opts": [
+        "Batch OS",
+        "Multiprogramming OS",
+        "Real-time OS",
+        "Time-sharing OS"
+      ],
+      "ans": 1,
+      "exp": "Multiprogramming keeps several jobs in main memory; when the running process blocks for I/O, the OS assigns the CPU to another job."
+    },
+    {
+      "q": "A time-sharing OS is characterised by:",
+      "opts": [
+        "Batch execution without interaction",
+        "Interaction with the user (e.g., keyboard) with the OS responding to instructions",
+        "Fixed deadlines only",
+        "Serial execution of jobs"
+      ],
+      "ans": 1,
+      "exp": "Time-sharing systems interact with users through input devices; the OS executes instructions and responds with output."
+    },
+    {
+      "q": "A Real-Time OS is typically used when:",
+      "opts": [
+        "Multiple users share a computer casually",
+        "Rigid, fixed timing constraints govern operations",
+        "Batch jobs must be queued",
+        "Cost-cutting is the priority"
+      ],
+      "ans": 1,
+      "exp": "Real-time systems have well-defined, fixed time constraints — used in dedicated systems that must meet deadlines."
+    },
+    {
+      "q": "In a batch OS, a job is assigned to the CPU:",
+      "opts": [
+        "When the previous job's execution completes",
+        "On a time slice",
+        "Based on I/O availability",
+        "At user request"
+      ],
+      "ans": 0,
+      "exp": "Batch OS stores similar jobs in memory; a new job takes the CPU only after the previous one finishes execution."
+    },
+    {
+      "q": "Each process in an OS is represented by:",
+      "opts": [
+        "A page table",
+        "A Process Control Block (PCB)",
+        "A file descriptor",
+        "A kernel thread"
+      ],
+      "ans": 1,
+      "exp": "A PCB stores metadata about a process — including the program counter — used by the OS to manage the process."
+    },
+    {
+      "q": "The program counter (PC) of a process indicates:",
+      "opts": [
+        "Number of instructions executed",
+        "Address of the next instruction to be executed",
+        "CPU utilisation percentage",
+        "Process priority"
+      ],
+      "ans": 1,
+      "exp": "The PC value indicates the address of the next instruction of the process being executed."
+    },
+    {
+      "q": "A process makes 4 fork() system calls. How many child processes are created?",
+      "opts": [
+        "4",
+        "8",
+        "15",
+        "16"
+      ],
+      "ans": 2,
+      "exp": "n fork() calls generate 2^n − 1 children: 2^4 − 1 = 15."
+    },
+    {
+      "q": "If Completion Time = 27 and Arrival Time = 5, Burst Time = 12, what is the Waiting Time?",
+      "opts": [
+        "22",
+        "10",
+        "12",
+        "15"
+      ],
+      "ans": 1,
+      "exp": "Turnaround = 27 − 5 = 22; Waiting = Turnaround − Burst = 22 − 12 = 10."
+    },
+    {
+      "q": "Turnaround Time is defined as:",
+      "opts": [
+        "Burst time − Arrival time",
+        "Completion time − Arrival time",
+        "Completion time − Burst time",
+        "Waiting time + Burst time"
+      ],
+      "ans": 1,
+      "exp": "Turnaround Time = Completion Time − Arrival Time."
+    },
+    {
+      "q": "Waiting Time is defined as:",
+      "opts": [
+        "Turnaround − Burst",
+        "Burst − Turnaround",
+        "Arrival − Burst",
+        "Completion + Arrival"
+      ],
+      "ans": 0,
+      "exp": "Waiting Time = Turnaround Time − Burst Time."
+    },
+    {
+      "q": "Which resources does a thread NOT share with other threads of the same process?",
+      "opts": [
+        "Code section",
+        "Data section",
+        "Open files and signals",
+        "Its own stack and register set"
+      ],
+      "ans": 3,
+      "exp": "Each thread has its own PC, register set, and stack; it shares the process's code, data, files and signals."
+    },
+    {
+      "q": "Which pair is a valid classification of threads?",
+      "opts": [
+        "Primary and secondary threads",
+        "User threads and kernel threads",
+        "Static and dynamic threads",
+        "Local and remote threads"
+      ],
+      "ans": 1,
+      "exp": "Threads are broadly user threads (implemented by user libraries) and kernel threads (implemented by the OS)."
+    },
+    {
+      "q": "Which of these is NOT typically an advantage of multithreaded programming?",
+      "opts": [
+        "Enhanced responsiveness",
+        "Resource sharing within a process",
+        "Economical use of resources",
+        "Guaranteed deadlock avoidance"
+      ],
+      "ans": 3,
+      "exp": "Multithreading is responsive, economical, shares process resources and exploits multiprocessors, but does not itself prevent deadlocks."
+    },
+    {
+      "q": "Which scheduling algorithm is the simplest and schedules based purely on arrival times?",
+      "opts": [
+        "FCFS",
+        "SJF",
+        "Round Robin",
+        "HRRN"
+      ],
+      "ans": 0,
+      "exp": "First Come First Serve is the simplest algorithm; jobs are scheduled strictly in arrival order."
+    },
+    {
+      "q": "Shortest Remaining Time First (SRTF) is:",
+      "opts": [
+        "Non-preemptive version of FCFS",
+        "Preemptive version of SJF",
+        "Priority scheduling",
+        "Round-robin variant"
+      ],
+      "ans": 1,
+      "exp": "SRTF preempts the running process if a newly arrived process has a shorter remaining burst — the preemptive form of SJF."
+    },
+    {
+      "q": "Round Robin scheduling gives each process:",
+      "opts": [
+        "Priority based on burst",
+        "A fixed time slice in a cyclic order",
+        "Only I/O time",
+        "Non-preemptive execution"
+      ],
+      "ans": 1,
+      "exp": "RR assigns each process a fixed time quantum in a cyclic fashion, giving fair sharing among all processes."
+    },
+    {
+      "q": "In non-preemptive priority scheduling, if two processes have equal priority, the tiebreaker is:",
+      "opts": [
+        "Random selection",
+        "Arrival time",
+        "Burst time",
+        "Process ID"
+      ],
+      "ans": 1,
+      "exp": "For equal priorities, scheduling defaults to arrival order."
+    },
+    {
+      "q": "Which scheduling algorithm avoids starvation via a response ratio?",
+      "opts": [
+        "SJF",
+        "Round Robin",
+        "HRRN",
+        "MLFQ"
+      ],
+      "ans": 2,
+      "exp": "HRRN = (Waiting + Burst) / Burst — long waits raise the ratio, so long-waiting processes eventually get scheduled."
+    },
+    {
+      "q": "In Multilevel Feedback Queue scheduling, a process that consumes too much CPU time is:",
+      "opts": [
+        "Terminated",
+        "Moved to a higher-priority queue",
+        "Moved to a lower-priority queue",
+        "Given a longer quantum in the same queue"
+      ],
+      "ans": 2,
+      "exp": "MLFQ demotes CPU-hungry processes to lower-priority queues based on CPU-burst behaviour, unlike static MLQ."
+    },
+    {
+      "q": "Which is NOT one of the three required conditions for a valid critical-section solution?",
+      "opts": [
+        "Mutual exclusion",
+        "Progress",
+        "Bounded waiting",
+        "Circular wait"
+      ],
+      "ans": 3,
+      "exp": "Solutions require mutual exclusion, progress, and bounded waiting. Circular wait is a deadlock condition."
+    },
+    {
+      "q": "A race condition is:",
+      "opts": [
+        "A process running faster than expected",
+        "When the final output depends on the order in which shared variables are accessed",
+        "Two processes with equal priorities",
+        "Blocking on I/O for too long"
+      ],
+      "ans": 1,
+      "exp": "Race conditions arise when the outcome depends on interleavings of accesses to shared variables."
+    },
+    {
+      "q": "Bounded waiting guarantees:",
+      "opts": [
+        "A process waits at most a fixed amount of wall-clock time",
+        "A bound exists on how many times other processes can enter the CS after one has requested it",
+        "No process ever waits",
+        "Waiting equals burst time"
+      ],
+      "ans": 1,
+      "exp": "Bounded waiting ensures a limit on how many times other processes may enter the critical section between a process's request and its grant."
+    },
+    {
+      "q": "A semaphore whose value ranges over an unrestricted integer domain is a:",
+      "opts": [
+        "Binary semaphore",
+        "Counting semaphore",
+        "Mutex",
+        "Spinlock"
+      ],
+      "ans": 1,
+      "exp": "Counting semaphores take unrestricted integers; binary semaphores take only 0/1 and implement mutual exclusion."
+    },
+    {
+      "q": "Binary semaphores are used to implement:",
+      "opts": [
+        "Deadlock avoidance",
+        "Mutual exclusion and process synchronisation",
+        "Priority scheduling",
+        "Paging"
+      ],
+      "ans": 1,
+      "exp": "Binary semaphores (values 0/1) implement mutual exclusion and synchronise concurrent processes."
+    },
+    {
+      "q": "A mutex differs from a counting semaphore in that:",
+      "opts": [
+        "A mutex has integer value",
+        "A mutex provides mutual exclusion — only one thread can hold it at a time",
+        "Semaphores cannot be shared",
+        "Mutex is only used in kernels"
+      ],
+      "ans": 1,
+      "exp": "A mutex is a mutual-exclusion primitive; only one owner holds it at a time, generalisable via semaphores."
+    },
+    {
+      "q": "Which set lists all four necessary conditions for deadlock?",
+      "opts": [
+        "Mutual exclusion, hold & wait, preemption, circular wait",
+        "Mutual exclusion, hold & wait, no preemption, circular wait",
+        "Starvation, hold & wait, no preemption, aging",
+        "Mutual exclusion, race condition, no preemption, circular wait"
+      ],
+      "ans": 1,
+      "exp": "Deadlock requires all four simultaneously: mutual exclusion, hold and wait, NO preemption, circular wait."
+    },
+    {
+      "q": "Windows and UNIX generally handle deadlock by:",
+      "opts": [
+        "Banker's algorithm",
+        "Deadlock detection and recovery",
+        "Ignoring the problem (Ostrich approach)",
+        "Wait-die scheme"
+      ],
+      "ans": 2,
+      "exp": "Since deadlock is rare, both Windows and UNIX ignore it and rely on a reboot — the 'ignore altogether' strategy."
+    },
+    {
+      "q": "Banker's algorithm is a technique for:",
+      "opts": [
+        "Deadlock detection",
+        "Deadlock avoidance",
+        "Deadlock recovery",
+        "Starvation prevention"
+      ],
+      "ans": 1,
+      "exp": "Banker's algorithm avoids deadlock — never allocating resources such that a safe sequence cannot be found."
+    },
+    {
+      "q": "The 'Hold and Wait' condition means:",
+      "opts": [
+        "Processes only wait, never hold resources",
+        "A process holds at least one resource while waiting for more",
+        "Resources are held permanently",
+        "Resources are never released"
+      ],
+      "ans": 1,
+      "exp": "Hold and wait: a process is holding at least one resource while requesting additional resources."
+    },
+    {
+      "q": "Overlays are best described as:",
+      "opts": [
+        "Fixed-size memory partitions",
+        "Only keeping in memory the instructions/data needed at a given time",
+        "A page replacement algorithm",
+        "A form of paging"
+      ],
+      "ans": 1,
+      "exp": "Overlays load only the instructions/data currently needed, letting a program larger than memory execute."
+    },
+    {
+      "q": "Swapping in multiprogramming refers to:",
+      "opts": [
+        "Moving a process out of memory when its time slice ends",
+        "Swapping CPU cores",
+        "Exchanging register values",
+        "Compacting free memory"
+      ],
+      "ans": 0,
+      "exp": "Swapping moves processes that have used their time slice out of memory to disk to make room for others."
+    },
+    {
+      "q": "In variable-partition allocation, which strategy leaves the LARGEST leftover hole after allocation?",
+      "opts": [
+        "First fit",
+        "Best fit",
+        "Worst fit",
+        "Next fit"
+      ],
+      "ans": 2,
+      "exp": "Worst fit deliberately places the process in the hole that leaves the maximum gap."
+    },
+    {
+      "q": "First fit allocates:",
+      "opts": [
+        "The smallest hole that fits",
+        "The largest hole",
+        "The first hole in which the process fits completely",
+        "A hole at random"
+      ],
+      "ans": 2,
+      "exp": "First fit scans free holes in order and allocates the first hole into which the process fits completely."
+    },
+    {
+      "q": "Best fit chooses the hole that:",
+      "opts": [
+        "Leaves the maximum gap",
+        "Fits the process with the minimum leftover space",
+        "Is at the highest address",
+        "Was most recently freed"
+      ],
+      "ans": 1,
+      "exp": "Best fit selects the hole in which the process fits with the least memory left over."
+    },
+    {
+      "q": "External fragmentation in contiguous allocation is primarily solved by:",
+      "opts": [
+        "Overlays",
+        "Swapping",
+        "Paging",
+        "Compaction of registers"
+      ],
+      "ans": 2,
+      "exp": "Paging removes the requirement of contiguous allocation by dividing memory into equal-size frames/pages."
+    },
+    {
+      "q": "Internal fragmentation occurs in systems that use:",
+      "opts": [
+        "Variable-size allocation units",
+        "Fixed-size allocation units",
+        "Segmentation only",
+        "Linked allocation"
+      ],
+      "ans": 1,
+      "exp": "Fixed-size units (fixed partitions, pages) waste space inside an allocated block. Variable-size units cause external fragmentation."
+    },
+    {
+      "q": "Segmentation differs from paging in that:",
+      "opts": [
+        "Segments are equal-sized",
+        "Segmentation provides a user view; the logical address space is a collection of segments (of varying sizes)",
+        "Segmentation cannot use paging",
+        "Segmentation eliminates page faults"
+      ],
+      "ans": 1,
+      "exp": "Segmentation is user-oriented: logical space is a collection of variable-length segments; it may or may not use paging underneath."
+    },
+    {
+      "q": "A page fault is:",
+      "opts": [
+        "An error when a program accesses an invalid address",
+        "An interrupt raised when a referenced page is in the virtual space but not in physical memory",
+        "A disk read error",
+        "A TLB parity error"
+      ],
+      "ans": 1,
+      "exp": "A page fault is a hardware interrupt when a referenced page is mapped in virtual memory but not present in physical memory."
+    },
+    {
+      "q": "Belady's anomaly refers to:",
+      "opts": [
+        "More page faults with more frames under LRU",
+        "More page faults with more frames under FIFO",
+        "Fewer page faults with fewer frames under Optimal",
+        "Thrashing at high multiprogramming levels"
+      ],
+      "ans": 1,
+      "exp": "Under FIFO replacement, more frames can paradoxically increase page faults (Belady's anomaly)."
+    },
+    {
+      "q": "Why is the Optimal page replacement algorithm not used in practice?",
+      "opts": [
+        "It causes Belady's anomaly",
+        "It requires future knowledge of the reference string",
+        "It has the highest fault rate",
+        "It needs special hardware"
+      ],
+      "ans": 1,
+      "exp": "Optimal replaces the page not used for the longest time in the FUTURE, which an OS cannot know; it serves as a benchmark."
+    },
+    {
+      "q": "LRU replaces the page that:",
+      "opts": [
+        "Was loaded first",
+        "Will not be used for the longest time in the future",
+        "Was least recently used",
+        "Has the highest reference count"
+      ],
+      "ans": 2,
+      "exp": "LRU replaces the least recently used page, based on past access history."
+    },
+    {
+      "q": "Virtual memory allows:",
+      "opts": [
+        "Only kernel code to execute",
+        "Processes to execute even when they cannot fit entirely in physical memory",
+        "Multiple OS instances to coexist",
+        "Faster CPU access than caches"
+      ],
+      "ans": 1,
+      "exp": "Virtual memory enables processes to execute outside of memory — larger than physical RAM allows."
+    },
+    {
+      "q": "Demand paging specifies that:",
+      "opts": [
+        "All pages are always in memory",
+        "If a memory region is not being used, it is swapped to disk to make room for other applications",
+        "Pages are pre-fetched sequentially",
+        "Kernel code cannot be paged"
+      ],
+      "ans": 1,
+      "exp": "Demand paging swaps out unused memory regions to disk so applications can use RAM they need now."
+    },
+    {
+      "q": "Disk Access Time equals:",
+      "opts": [
+        "Seek time + transfer time",
+        "Rotational latency + transfer time",
+        "Seek time + rotational latency + transfer time",
+        "Seek time × rotational latency"
+      ],
+      "ans": 2,
+      "exp": "Access time = seek + rotational latency + transfer time."
+    },
+    {
+      "q": "Seek time is:",
+      "opts": [
+        "Time for the sector to rotate under the head",
+        "Time to position the disk arm on the desired track",
+        "Time to transfer bytes",
+        "Total disk response time"
+      ],
+      "ans": 1,
+      "exp": "Seek time is the time to locate the disk arm on the specified track."
+    },
+    {
+      "q": "Rotational latency is:",
+      "opts": [
+        "Track-positioning time",
+        "Time for the desired sector to rotate into position under the head",
+        "Byte-transfer time",
+        "Interrupt-handling time"
+      ],
+      "ans": 1,
+      "exp": "Rotational latency is the time taken for the desired sector to rotate into a readable position."
+    },
+    {
+      "q": "Which disk scheduling algorithm behaves like an elevator?",
+      "opts": [
+        "FCFS",
+        "SSTF",
+        "SCAN",
+        "CLOOK"
+      ],
+      "ans": 2,
+      "exp": "SCAN moves the arm in one direction servicing requests, reverses at the end, and services on the return — the elevator algorithm."
+    },
+    {
+      "q": "SSTF schedules requests based on:",
+      "opts": [
+        "Arrival order",
+        "Shortest seek time from the current head position",
+        "Priority level",
+        "Track number"
+      ],
+      "ans": 1,
+      "exp": "SSTF (Shortest Seek Time First) picks the request nearest to the current head position, minimising seek time."
+    },
+    {
+      "q": "How does LOOK improve upon SCAN?",
+      "opts": [
+        "Services requests in arrival order",
+        "Reverses at the last pending request instead of travelling to the disk's physical end",
+        "Always jumps to the far end",
+        "Uses shortest seek time"
+      ],
+      "ans": 1,
+      "exp": "LOOK avoids the wasted traversal to the disk edge by reversing direction at the last request in front of the head."
+    },
+    {
+      "q": "CLOOK differs from LOOK in that:",
+      "opts": [
+        "It moves in one direction and then jumps to the other end's last request rather than reversing",
+        "It ignores requests behind the head",
+        "It uses random ordering",
+        "It only services writes"
+      ],
+      "ans": 0,
+      "exp": "CLOOK, like CSCAN, is one-directional; after serving the last request on the way, it jumps to the last request at the other end."
+    },
+    {
+      "q": "A kernel that contains all OS code in a single executable image is called:",
+      "opts": [
+        "Microkernel",
+        "Monolithic kernel",
+        "Macro kernel",
+        "Hybrid kernel"
+      ],
+      "ans": 1,
+      "exp": "A monolithic kernel packs all OS services into one image; microkernel runs only minimal services; macro kernel combines both."
+    },
+    {
+      "q": "A microkernel runs:",
+      "opts": [
+        "All OS services in kernel space",
+        "Only minimal performance-affecting services in kernel space, with the rest handled by processes",
+        "No kernel services at all",
+        "Only user applications"
+      ],
+      "ans": 1,
+      "exp": "Microkernels keep the kernel small — running only minimal services — and delegate the rest to user-mode processes."
+    },
+    {
+      "q": "Thrashing occurs when:",
+      "opts": [
+        "The CPU executes too many user instructions",
+        "The processor spends most of its time swapping pages instead of executing instructions",
+        "Too many interrupts arrive per second",
+        "The disk queue is empty"
+      ],
+      "ans": 1,
+      "exp": "Thrashing is when excessive paging in a virtual-memory system collapses useful throughput."
+    },
+    {
+      "q": "Which technique lets multiple users share a single copy of a program if the code cannot modify itself and each user's data is stored separately?",
+      "opts": [
+        "Demand paging",
+        "Re-entrancy",
+        "Spooling",
+        "Overlays"
+      ],
+      "ans": 1,
+      "exp": "Re-entrancy is a memory-saving technique for multiprogrammed time-sharing systems."
+    },
+    {
+      "q": "Aging is a technique used to:",
+      "opts": [
+        "Prevent deadlock",
+        "Avoid starvation in resource scheduling",
+        "Reduce internal fragmentation",
+        "Speed up context switching"
+      ],
+      "ans": 1,
+      "exp": "Aging gradually raises the priority of long-waiting processes so they eventually get scheduled — solving starvation."
+    },
+    {
+      "q": "Starvation in resource scheduling is:",
+      "opts": [
+        "A process finishing very quickly",
+        "A waiting process not getting the resources it needs for a long time",
+        "Two processes in a deadlock",
+        "Excessive CPU utilisation"
+      ],
+      "ans": 1,
+      "exp": "Starvation: a process waits indefinitely because resources keep being allocated to others."
+    },
+    {
+      "q": "Spooling is most closely associated with:",
+      "opts": [
+        "CPU scheduling",
+        "Printing — queueing multiple applications' output jobs on disk",
+        "Page replacement",
+        "Deadlock avoidance"
+      ],
+      "ans": 1,
+      "exp": "Spooling temporarily gathers data (classically print jobs) on disk and queues them to the device."
+    },
+    {
+      "q": "Logical vs physical address space:",
+      "opts": [
+        "Both are generated by the memory unit",
+        "Logical address is generated by the CPU; physical address is seen by the memory unit",
+        "Logical address is seen by hardware only",
+        "Physical address is generated at compile time"
+      ],
+      "ans": 1,
+      "exp": "Logical addresses are CPU-generated (virtual); physical addresses are what the memory unit uses."
+    }
+  ],
+  "DBMS": [
+    {
+      "q": "A database is best defined as:",
+      "opts": [
+        "Any file on disk",
+        "A collection of related data representing some aspect of the real world",
+        "Only a spreadsheet",
+        "A network protocol"
+      ],
+      "ans": 1,
+      "exp": "A database is a collection of related data representing some aspect of the real world, built and populated for a certain task."
+    },
+    {
+      "q": "Which of the following is NOT a problem of file-processing systems that DBMS was designed to solve?",
+      "opts": [
+        "Data redundancy and inconsistency",
+        "Difficulty in accessing data",
+        "Atomicity of updates",
+        "Physical storage of data on disk"
+      ],
+      "ans": 3,
+      "exp": "DBMS addresses redundancy, access difficulty, isolation, integrity, atomicity, concurrency and security. Physical storage exists in any file system."
+    },
+    {
+      "q": "In an ER diagram, a weak entity set:",
+      "opts": [
+        "Has a primary key underlined with a solid line",
+        "Lacks sufficient attributes for unique identification and uses a discriminator (dashed underline)",
+        "Cannot participate in relationships",
+        "Must have a composite primary key"
+      ],
+      "ans": 1,
+      "exp": "A weak entity set lacks a primary key; it has a partial key (discriminator) shown with a dashed underline and depends on a strong entity."
+    },
+    {
+      "q": "A strong entity set is one that:",
+      "opts": [
+        "Cannot exist without another entity",
+        "Contains sufficient attributes to uniquely identify all its entities (has a primary key)",
+        "Only has multi-valued attributes",
+        "Has no relationships"
+      ],
+      "ans": 1,
+      "exp": "Strong entity sets have a primary key of their own, drawn as a solid underline."
+    },
+    {
+      "q": "A relationship set where three entity sets participate is called:",
+      "opts": [
+        "Unary",
+        "Binary",
+        "Ternary",
+        "N-ary"
+      ],
+      "ans": 2,
+      "exp": "Ternary relationship sets involve exactly three participating entity sets."
+    },
+    {
+      "q": "A relationship set where only one entity set participates is called:",
+      "opts": [
+        "Unary",
+        "Binary",
+        "Ternary",
+        "Recursive N-ary"
+      ],
+      "ans": 0,
+      "exp": "Unary relationship sets have one participating entity set (also called recursive)."
+    },
+    {
+      "q": "'One employee manages many departments, each managed by one employee' is which cardinality (employee → department)?",
+      "opts": [
+        "One-to-one",
+        "One-to-many",
+        "Many-to-one",
+        "Many-to-many"
+      ],
+      "ans": 1,
+      "exp": "An A-entity relates to many B-entities, while each B-entity relates to at most one A-entity — one-to-many."
+    },
+    {
+      "q": "'Age' derived from 'Date of Birth' is an example of which attribute type?",
+      "opts": [
+        "Composite",
+        "Multi-valued",
+        "Derived",
+        "Key"
+      ],
+      "ans": 2,
+      "exp": "Derived attributes are computed from other attributes."
+    },
+    {
+      "q": "'Name' composed of first, middle and last name is which attribute type?",
+      "opts": [
+        "Simple",
+        "Composite",
+        "Multi-valued",
+        "Derived"
+      ],
+      "ans": 1,
+      "exp": "Composite attributes are made up of several simple sub-attributes."
+    },
+    {
+      "q": "A phone-number attribute holding multiple numbers per person is:",
+      "opts": [
+        "Simple",
+        "Composite",
+        "Multi-valued",
+        "Derived"
+      ],
+      "ans": 2,
+      "exp": "Multi-valued attributes can hold more than one value for a given entity."
+    },
+    {
+      "q": "Which constraint states that no attribute of a primary key may be NULL?",
+      "opts": [
+        "Domain constraint",
+        "Referential integrity",
+        "Entity integrity",
+        "Tuple uniqueness"
+      ],
+      "ans": 2,
+      "exp": "Entity integrity requires primary-key attributes to be non-null."
+    },
+    {
+      "q": "A foreign key value must:",
+      "opts": [
+        "Always be unique",
+        "Never be NULL",
+        "Either exist in the referenced relation's primary key or be NULL",
+        "Be a composite attribute"
+      ],
+      "ans": 2,
+      "exp": "Referential integrity: every foreign key is either present among the referenced primary key values or is NULL."
+    },
+    {
+      "q": "A domain constraint specifies:",
+      "opts": [
+        "The set of allowed values (atomic values from a domain) for an attribute",
+        "That primary keys are unique",
+        "That tuples are unique",
+        "That foreign keys exist"
+      ],
+      "ans": 0,
+      "exp": "Domain constraints restrict the values (from an atomic domain) an attribute may take."
+    },
+    {
+      "q": "Tuple uniqueness constraint specifies that:",
+      "opts": [
+        "All primary key values are distinct",
+        "All tuples must be necessarily unique in any relation",
+        "No NULLs are allowed",
+        "Foreign keys must not repeat"
+      ],
+      "ans": 1,
+      "exp": "Tuple uniqueness requires every tuple in a relation to be unique."
+    },
+    {
+      "q": "A super key is:",
+      "opts": [
+        "The primary key only",
+        "Any set of attributes that identifies each tuple uniquely (may include extra attributes)",
+        "A minimal candidate key",
+        "A foreign key"
+      ],
+      "ans": 1,
+      "exp": "Super key: any attribute set uniquely identifying tuples; a candidate key is a minimal super key."
+    },
+    {
+      "q": "Which key is defined as a MINIMAL set of attributes that uniquely identifies each tuple?",
+      "opts": [
+        "Super key",
+        "Candidate key",
+        "Composite key",
+        "Unique key"
+      ],
+      "ans": 1,
+      "exp": "A candidate key is a minimal super key."
+    },
+    {
+      "q": "Candidate keys not chosen as the primary key are called:",
+      "opts": [
+        "Foreign keys",
+        "Surrogate keys",
+        "Alternate keys",
+        "Partial keys"
+      ],
+      "ans": 2,
+      "exp": "Alternate keys are the unimplemented candidate keys."
+    },
+    {
+      "q": "A primary key made of multiple attributes is called:",
+      "opts": [
+        "Composite key",
+        "Foreign key",
+        "Alternate key",
+        "Super key"
+      ],
+      "ans": 0,
+      "exp": "Composite key: primary key composed of multiple attributes."
+    },
+    {
+      "q": "Which is true about a UNIQUE key (as distinct from a primary key)?",
+      "opts": [
+        "Cannot be NULL",
+        "May have a NULL value and is non-updatable once assigned",
+        "Must be composite",
+        "Every table needs exactly one"
+      ],
+      "ans": 1,
+      "exp": "Unique keys allow NULL and, per the notes, are non-updatable once assigned."
+    },
+    {
+      "q": "A functional dependency X → Y is trivial if and only if:",
+      "opts": [
+        "Y ⊆ X",
+        "X ⊆ Y",
+        "X ∩ Y = ∅",
+        "Y is a super key"
+      ],
+      "ans": 0,
+      "exp": "Trivial FD: RHS is a subset of LHS."
+    },
+    {
+      "q": "Non-trivial FD X → Y means:",
+      "opts": [
+        "Y ⊆ X",
+        "At least one attribute of Y is not in X",
+        "X is empty",
+        "Y = X"
+      ],
+      "ans": 1,
+      "exp": "Non-trivial: at least one RHS attribute is not in the LHS."
+    },
+    {
+      "q": "The set of all attributes functionally determined by an attribute set is called its:",
+      "opts": [
+        "Domain",
+        "Closure",
+        "Cover",
+        "Projection"
+      ],
+      "ans": 1,
+      "exp": "The closure X+ is everything functionally derivable from X."
+    },
+    {
+      "q": "A decomposition of R into R1…Rn is LOSSLESS when:",
+      "opts": [
+        "R1 ⋈ R2 ⋈ … ⋈ Rn ⊃ R",
+        "R1 ⋈ R2 ⋈ … ⋈ Rn = R",
+        "R1 ∪ R2 ∪ … ∪ Rn = R",
+        "Each Ri is in BCNF"
+      ],
+      "ans": 1,
+      "exp": "Lossless join: natural join of sub-relations reproduces the original."
+    },
+    {
+      "q": "A lossy join decomposition satisfies:",
+      "opts": [
+        "R1 ⋈ … ⋈ Rn = R",
+        "R1 ⋈ … ⋈ Rn ⊃ R",
+        "R1 ⋈ … ⋈ Rn ⊂ R",
+        "R1 ⋈ … ⋈ Rn is empty"
+      ],
+      "ans": 1,
+      "exp": "Lossy join: the natural join yields extra spurious tuples (superset of R)."
+    },
+    {
+      "q": "Dependency preservation ensures that:",
+      "opts": [
+        "No FDs of the original relation are lost after decomposition",
+        "All tuples are preserved",
+        "Only primary keys are retained",
+        "Relations become atomic"
+      ],
+      "ans": 0,
+      "exp": "Dependency preservation keeps every original FD satisfied by the decomposed sub-relations."
+    },
+    {
+      "q": "A relation is in 1NF if:",
+      "opts": [
+        "It has no partial dependencies",
+        "Each cell contains only an atomic (or NULL) value",
+        "It has no transitive dependencies",
+        "Every determinant is a super key"
+      ],
+      "ans": 1,
+      "exp": "1NF: attribute values are atomic (single-valued) or NULL."
+    },
+    {
+      "q": "A relation is in 2NF if it is in 1NF and has no:",
+      "opts": [
+        "Transitive dependency",
+        "Partial dependency",
+        "Multivalued dependency",
+        "Join dependency"
+      ],
+      "ans": 1,
+      "exp": "2NF removes partial dependencies — proper subsets of a candidate key determining non-prime attributes."
+    },
+    {
+      "q": "A → B is a transitive dependency (violating 3NF) when:",
+      "opts": [
+        "A is a super key and B is prime",
+        "A is not a super key and B is a non-prime attribute",
+        "A is a candidate key",
+        "B ⊆ A"
+      ],
+      "ans": 1,
+      "exp": "3NF is violated when a non-super-key determines a non-prime attribute."
+    },
+    {
+      "q": "BCNF requires that for every non-trivial FD A → B:",
+      "opts": [
+        "B is a prime attribute",
+        "A is a super key",
+        "A is a foreign key",
+        "A and B are disjoint"
+      ],
+      "ans": 1,
+      "exp": "BCNF: the determinant of every non-trivial FD must be a super key."
+    },
+    {
+      "q": "Read(A) in a transaction:",
+      "opts": [
+        "Writes A to disk",
+        "Reads A from the database into a main-memory buffer",
+        "Deletes A",
+        "Locks A permanently"
+      ],
+      "ans": 1,
+      "exp": "Read(A) reads A's value from the database and stores it in the buffer in main memory."
+    },
+    {
+      "q": "Write(A) in a transaction:",
+      "opts": [
+        "Reads A from disk",
+        "Writes A's updated buffer value back to the database",
+        "Locks A",
+        "Aborts A"
+      ],
+      "ans": 1,
+      "exp": "Write(A) writes the updated value of A from buffer to database."
+    },
+    {
+      "q": "Which ACID property guarantees a transaction happens completely or not at all?",
+      "opts": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ],
+      "ans": 0,
+      "exp": "Atomicity forbids partial transactions."
+    },
+    {
+      "q": "Which ACID property guarantees that database integrity constraints are maintained?",
+      "opts": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ],
+      "ans": 1,
+      "exp": "Consistency ensures the DB remains consistent before and after every transaction."
+    },
+    {
+      "q": "Which ACID property ensures concurrent transactions produce the same result as some serial ordering?",
+      "opts": [
+        "Atomicity",
+        "Consistency",
+        "Isolation",
+        "Durability"
+      ],
+      "ans": 2,
+      "exp": "Isolation ensures concurrent transactions do not interfere; the outcome equals some serial execution."
+    },
+    {
+      "q": "Durability ensures that:",
+      "opts": [
+        "Transactions run instantly",
+        "Committed changes are permanent and survive failures",
+        "Failed transactions leave no trace",
+        "Undoable operations are logged"
+      ],
+      "ans": 1,
+      "exp": "Durability persists committed changes to disk permanently, surviving any failure."
+    },
+    {
+      "q": "A transaction enters PARTIALLY COMMITTED state when:",
+      "opts": [
+        "Its first instruction executes",
+        "Its last instruction has executed but changes are still in the main-memory buffer",
+        "Its changes are written to disk",
+        "It is rolled back"
+      ],
+      "ans": 1,
+      "exp": "After the last instruction, changes are still buffered — partially committed."
+    },
+    {
+      "q": "A transaction enters ABORTED state after:",
+      "opts": [
+        "Successful commit",
+        "Failure and rollback of changes",
+        "Its first read",
+        "Being paused"
+      ],
+      "ans": 1,
+      "exp": "After failure the changes are undone via rollback, then the transaction is aborted."
+    },
+    {
+      "q": "The last state in a transaction's life cycle is:",
+      "opts": [
+        "Committed",
+        "Aborted",
+        "Terminated",
+        "Failed"
+      ],
+      "ans": 2,
+      "exp": "After committed or aborted, transactions enter the terminated state — end of life cycle."
+    },
+    {
+      "q": "Which schedules are ALWAYS consistent, recoverable, cascadeless and strict?",
+      "opts": [
+        "Non-serial schedules",
+        "Serial schedules",
+        "Concurrent schedules",
+        "View serializable schedules"
+      ],
+      "ans": 1,
+      "exp": "Serial schedules always have all four properties; non-serial ones may not."
+    },
+    {
+      "q": "A non-serial schedule convertible to a serial one by swapping non-conflicting operations is:",
+      "opts": [
+        "View serializable",
+        "Conflict serializable",
+        "Cascadeless",
+        "Strict"
+      ],
+      "ans": 1,
+      "exp": "That is the definition of conflict serializability."
+    },
+    {
+      "q": "A schedule where T2 dirty-reads from uncommitted T1 and commits BEFORE T1 is:",
+      "opts": [
+        "Recoverable",
+        "Irrecoverable",
+        "Strict",
+        "Cascadeless"
+      ],
+      "ans": 1,
+      "exp": "If the reader commits before the writer it depended on, no rollback can save the read — irrecoverable."
+    },
+    {
+      "q": "A cascading schedule is one where:",
+      "opts": [
+        "Only one transaction runs at a time",
+        "Failure of one transaction causes several dependent transactions to roll back",
+        "Transactions run in reverse arrival order",
+        "Reads only happen at commit"
+      ],
+      "ans": 1,
+      "exp": "Cascading rollback: aborting one transaction cascades to others that read its dirty data."
+    },
+    {
+      "q": "In a strict schedule, a transaction:",
+      "opts": [
+        "Reads freely from uncommitted data",
+        "Is neither allowed to read nor write a data item until the last writer commits/aborts",
+        "Only writes",
+        "Only reads"
+      ],
+      "ans": 1,
+      "exp": "Strict schedules delay both reads and writes until the previous writer commits or aborts."
+    },
+    {
+      "q": "σ (Selection) operator:",
+      "opts": [
+        "Chooses columns",
+        "Chooses rows satisfying a condition",
+        "Joins two relations",
+        "Renames a relation"
+      ],
+      "ans": 1,
+      "exp": "Selection filters rows based on a predicate; projection filters columns."
+    },
+    {
+      "q": "∏ (Projection) operator:",
+      "opts": [
+        "Chooses rows",
+        "Chooses columns",
+        "Sorts tuples",
+        "Removes NULLs"
+      ],
+      "ans": 1,
+      "exp": "Projection retains selected columns of a relation."
+    },
+    {
+      "q": "Cross product of R1 (m rows) × R2 (n rows) returns how many rows?",
+      "opts": [
+        "m + n",
+        "m − n",
+        "m × n",
+        "max(m,n)"
+      ],
+      "ans": 2,
+      "exp": "Cross product yields every combination — m×n tuples."
+    },
+    {
+      "q": "In relational algebra, minimum rows returned by R1 ∪ R2 (m,n rows) is:",
+      "opts": [
+        "0",
+        "m + n",
+        "max(m, n)",
+        "min(m, n)"
+      ],
+      "ans": 2,
+      "exp": "Union returns at least max(m, n) tuples (if one set's tuples subset the other's) and at most m + n."
+    },
+    {
+      "q": "R1 − R2 returns at most how many rows?",
+      "opts": [
+        "m",
+        "n",
+        "m + n",
+        "m − n"
+      ],
+      "ans": 0,
+      "exp": "Difference R1 − R2 returns at most m rows (all of R1 if none are in R2)."
+    },
+    {
+      "q": "Natural join of two relations with NO common attribute equals:",
+      "opts": [
+        "Union",
+        "Intersection",
+        "Cross product",
+        "Left outer join"
+      ],
+      "ans": 2,
+      "exp": "Without a common attribute, no equality condition exists, so natural join becomes the Cartesian product."
+    },
+    {
+      "q": "Which operator returns tuples of A associated with EVERY tuple of B?",
+      "opts": [
+        "A ⋈ B",
+        "A / B (division)",
+        "A − B",
+        "A ⟕ B"
+      ],
+      "ans": 1,
+      "exp": "Division answers 'for all' queries; B's attributes must be a proper subset of A's."
+    },
+    {
+      "q": "Left outer join of R and S returns:",
+      "opts": [
+        "Only matching tuples",
+        "All tuples of R and matching tuples of S (with NULLs for unmatched S)",
+        "All tuples of S only",
+        "All tuples of R and S with duplicates"
+      ],
+      "ans": 1,
+      "exp": "LEFT OUTER JOIN keeps every tuple of R; unmatched S columns are NULL."
+    },
+    {
+      "q": "Full outer join of R and S returns:",
+      "opts": [
+        "Only intersection",
+        "Union of all tuples of R and S with NULLs in unmatched attributes",
+        "Only R",
+        "Only S"
+      ],
+      "ans": 1,
+      "exp": "FULL OUTER JOIN keeps every tuple of both R and S with NULLs where unmatched."
+    },
+    {
+      "q": "A clustering index is created on:",
+      "opts": [
+        "A key field in an unordered file",
+        "A non-key field on which records are physically ordered",
+        "Any secondary access path",
+        "A hash bucket"
+      ],
+      "ans": 1,
+      "exp": "Clustering index is built on a non-key field on which the data file is physically ordered."
+    },
+    {
+      "q": "A primary index is:",
+      "opts": [
+        "A secondary access path",
+        "An ordered file with (key, block-pointer) fields, matching primary-key ordering of data",
+        "An index on any non-key field",
+        "An index over multiple tables"
+      ],
+      "ans": 1,
+      "exp": "Primary index: ordered file with the primary key and a pointer to the data block containing that key."
+    },
+    {
+      "q": "A secondary index:",
+      "opts": [
+        "Replaces the primary index",
+        "Provides additional access paths for a file for which primary access already exists",
+        "Removes indexing",
+        "Is used only for range queries"
+      ],
+      "ans": 1,
+      "exp": "Secondary indexes give additional means of accessing a file that already has primary access."
+    },
+    {
+      "q": "Why is searching generally faster in a B+ tree than in a B tree?",
+      "opts": [
+        "B+ trees are always binary",
+        "Non-leaf B+ nodes hold no record pointers, so they pack more keys and the tree is shallower",
+        "B+ trees store data only in the root",
+        "B trees do not allow range queries"
+      ],
+      "ans": 1,
+      "exp": "B+ trees' internal nodes have higher fan-out, decreasing tree depth."
+    },
+    {
+      "q": "The 'order' of a B-tree is:",
+      "opts": [
+        "The height of the tree",
+        "The maximum number of children a node can have",
+        "The number of keys in the root",
+        "The block size"
+      ],
+      "ans": 1,
+      "exp": "Order = maximum number of children a node can have."
+    },
+    {
+      "q": "In a B-tree of order P, the root can have between how many children?",
+      "opts": [
+        "1 and P",
+        "2 and P",
+        "⌈P/2⌉ and P",
+        "P and 2P"
+      ],
+      "ans": 1,
+      "exp": "Per the notes, the root can have between 2 and P children."
+    }
+  ],
+  "SQL": [
+    {
+      "q": "Which set of commands belongs to DDL?",
+      "opts": [
+        "SELECT, INSERT, UPDATE",
+        "CREATE, ALTER, DROP, TRUNCATE",
+        "GRANT, REVOKE",
+        "COMMIT, ROLLBACK, SAVEPOINT"
+      ],
+      "ans": 1,
+      "exp": "DDL defines schema structure: CREATE, ALTER, DROP, TRUNCATE, RENAME."
+    },
+    {
+      "q": "Which commands belong to DML?",
+      "opts": [
+        "CREATE, DROP",
+        "SELECT, INSERT, UPDATE, DELETE, MERGE",
+        "GRANT, REVOKE",
+        "COMMIT, ROLLBACK"
+      ],
+      "ans": 1,
+      "exp": "DML manipulates data: SELECT, INSERT, UPDATE, DELETE, MERGE."
+    },
+    {
+      "q": "GRANT and REVOKE belong to which language category?",
+      "opts": [
+        "DDL",
+        "DML",
+        "DCL",
+        "TCL"
+      ],
+      "ans": 2,
+      "exp": "DCL controls permissions."
+    },
+    {
+      "q": "COMMIT, ROLLBACK and SAVEPOINT belong to which language category?",
+      "opts": [
+        "DDL",
+        "DML",
+        "DCL",
+        "TCL"
+      ],
+      "ans": 3,
+      "exp": "TCL controls transactions."
+    },
+    {
+      "q": "Which command performs an UPSERT (insert or update) operation?",
+      "opts": [
+        "REPLACE",
+        "MERGE",
+        "UPDATE",
+        "COALESCE"
+      ],
+      "ans": 1,
+      "exp": "MERGE is the DML statement for UPSERT semantics."
+    },
+    {
+      "q": "Which is the key difference between DELETE and TRUNCATE?",
+      "opts": [
+        "DELETE removes the table structure; TRUNCATE does not",
+        "TRUNCATE removes all records and reclaims allocated space and is DDL; DELETE is DML and can use WHERE",
+        "DELETE cannot be rolled back",
+        "TRUNCATE can delete specific rows"
+      ],
+      "ans": 1,
+      "exp": "TRUNCATE (DDL) removes all rows including allocated space, no WHERE; DELETE (DML) removes selected rows, structure and space intact."
+    },
+    {
+      "q": "RENAME belongs to which category of SQL commands?",
+      "opts": [
+        "DDL",
+        "DML",
+        "DCL",
+        "TCL"
+      ],
+      "ans": 0,
+      "exp": "RENAME (renaming an object) is a DDL command per the notes."
+    },
+    {
+      "q": "Which query returns only unique country values from Customers?",
+      "opts": [
+        "SELECT UNIQUE Country FROM Customers;",
+        "SELECT DISTINCT Country FROM Customers;",
+        "SELECT Country FROM Customers GROUP BY *;",
+        "SELECT ONLY Country FROM Customers;"
+      ],
+      "ans": 1,
+      "exp": "SELECT DISTINCT returns only different values of the listed columns."
+    },
+    {
+      "q": "'SELECT * FROM Customers;' means:",
+      "opts": [
+        "Select the number of customers",
+        "Select all columns of all rows in Customers",
+        "Select only the first row",
+        "Select all tables named Customers"
+      ],
+      "ans": 1,
+      "exp": "* is a wildcard for all columns."
+    },
+    {
+      "q": "How do you correctly test for NULL values?",
+      "opts": [
+        "WHERE Address = NULL",
+        "WHERE Address == NULL",
+        "WHERE Address IS NULL",
+        "WHERE Address <> NULL"
+      ],
+      "ans": 2,
+      "exp": "NULL cannot be compared with =/<>; use IS NULL / IS NOT NULL."
+    },
+    {
+      "q": "Which is the correct 'not equal' operator in standard SQL?",
+      "opts": [
+        "!==",
+        "<>",
+        "~=",
+        "<>= "
+      ],
+      "ans": 1,
+      "exp": "Standard SQL uses <> for not-equal; some dialects also accept !=."
+    },
+    {
+      "q": "An UPDATE statement without a WHERE clause will:",
+      "opts": [
+        "Fail with an error",
+        "Update only the first row",
+        "Update every row in the table",
+        "Update no rows"
+      ],
+      "ans": 2,
+      "exp": "Omitting WHERE applies the SET clause to all rows — a classic interview trap."
+    },
+    {
+      "q": "A DELETE statement without a WHERE clause:",
+      "opts": [
+        "Fails",
+        "Deletes only the first row",
+        "Deletes all rows but leaves the table structure",
+        "Drops the table"
+      ],
+      "ans": 2,
+      "exp": "DELETE without WHERE removes all rows but preserves the table structure, attributes and indexes."
+    },
+    {
+      "q": "Which clause combines conditions such that a row must satisfy ALL of them?",
+      "opts": [
+        "OR",
+        "AND",
+        "NOT",
+        "IN"
+      ],
+      "ans": 1,
+      "exp": "AND requires all connected conditions to be TRUE."
+    },
+    {
+      "q": "The NOT operator in a WHERE clause:",
+      "opts": [
+        "Combines two conditions",
+        "Returns rows where the condition is FALSE",
+        "Sorts data",
+        "Only works with NULL"
+      ],
+      "ans": 1,
+      "exp": "NOT returns rows where the given condition is NOT TRUE."
+    },
+    {
+      "q": "'ORDER BY Country ASC, CustomerName DESC' does:",
+      "opts": [
+        "Sorts by Country descending only",
+        "Sorts by Country ascending, ties broken by CustomerName descending",
+        "Sorts by CustomerName first",
+        "Errors out"
+      ],
+      "ans": 1,
+      "exp": "Multiple ORDER BY columns sort hierarchically left to right."
+    },
+    {
+      "q": "By default, ORDER BY sorts:",
+      "opts": [
+        "Descending",
+        "Ascending",
+        "Randomly",
+        "By primary key"
+      ],
+      "ans": 1,
+      "exp": "Default order is ascending; use DESC for descending."
+    },
+    {
+      "q": "Which pattern finds customer names with 'r' in the SECOND position?",
+      "opts": [
+        "LIKE 'r%'",
+        "LIKE '%r'",
+        "LIKE '_r%'",
+        "LIKE '%_r'"
+      ],
+      "ans": 2,
+      "exp": "Underscore matches exactly one char; '_r%' = any first character, 'r' second, anything after."
+    },
+    {
+      "q": "What does 'LIKE a__%' match?",
+      "opts": [
+        "Names starting with 'a', at least 2 characters",
+        "Names starting with 'a', at least 3 characters",
+        "Names ending in 'a'",
+        "Names containing 'a'"
+      ],
+      "ans": 1,
+      "exp": "'a' + two underscores + % → at least 3 characters starting with 'a'."
+    },
+    {
+      "q": "Which wildcard represents zero, one, or multiple characters in LIKE?",
+      "opts": [
+        "_",
+        "*",
+        "%",
+        "?"
+      ],
+      "ans": 2,
+      "exp": "% is zero-or-more characters; underscore is exactly one character."
+    },
+    {
+      "q": "WHERE Price BETWEEN 10 AND 20 selects:",
+      "opts": [
+        "Prices strictly between 10 and 20 (exclusive)",
+        "Prices from 10 to 20 inclusive",
+        "Prices ≥ 10 only",
+        "Prices ≤ 20 only"
+      ],
+      "ans": 1,
+      "exp": "BETWEEN is inclusive of both endpoints."
+    },
+    {
+      "q": "WHERE Country IN ('Germany','France','UK') is shorthand for:",
+      "opts": [
+        "Multiple AND conditions",
+        "Multiple OR conditions",
+        "A JOIN",
+        "A subquery only"
+      ],
+      "ans": 1,
+      "exp": "IN acts as an OR-chained equality; can also take a subquery."
+    },
+    {
+      "q": "Which is a valid syntactic use of IN with a subquery?",
+      "opts": [
+        "WHERE Country IN 'Germany','France'",
+        "WHERE Country IN (SELECT Country FROM Suppliers)",
+        "WHERE Country IN SELECT Country FROM Suppliers",
+        "WHERE Country IN Suppliers"
+      ],
+      "ans": 1,
+      "exp": "IN accepts a value list or a SELECT statement enclosed in parentheses."
+    },
+    {
+      "q": "Inserting without listing column names requires:",
+      "opts": [
+        "Values in any order",
+        "Values in the same order as the table's columns, one for each",
+        "Only NULLs",
+        "Numeric values only"
+      ],
+      "ans": 1,
+      "exp": "Omitting column list requires supplying values for every column in table column order."
+    },
+    {
+      "q": "Which is the syntax to update multiple columns?",
+      "opts": [
+        "UPDATE t SET c1=v1 AND c2=v2 WHERE …",
+        "UPDATE t SET c1=v1, c2=v2 WHERE …",
+        "UPDATE t (c1,c2) VALUES (v1,v2)",
+        "UPDATE t.c1=v1, t.c2=v2 WHERE …"
+      ],
+      "ans": 1,
+      "exp": "Multiple SET assignments are separated by commas."
+    },
+    {
+      "q": "Which aggregate returns the number of rows matching a criterion?",
+      "opts": [
+        "SUM()",
+        "COUNT()",
+        "TOTAL()",
+        "ROWS()"
+      ],
+      "ans": 1,
+      "exp": "COUNT() counts rows."
+    },
+    {
+      "q": "MIN() returns:",
+      "opts": [
+        "Smallest value of the selected column",
+        "Number of NULLs",
+        "First inserted row",
+        "Median"
+      ],
+      "ans": 0,
+      "exp": "MIN() returns the smallest value of a column."
+    },
+    {
+      "q": "MAX() returns:",
+      "opts": [
+        "Largest value of the selected column",
+        "Last inserted row",
+        "Highest ID",
+        "Row count"
+      ],
+      "ans": 0,
+      "exp": "MAX() returns the largest value of a column."
+    },
+    {
+      "q": "AVG() returns:",
+      "opts": [
+        "Sum of numeric column",
+        "Average of numeric column",
+        "Median of numeric column",
+        "Mode of numeric column"
+      ],
+      "ans": 1,
+      "exp": "AVG() returns the average value of a numeric column."
+    },
+    {
+      "q": "SUM() returns:",
+      "opts": [
+        "Row count",
+        "Total sum of a numeric column",
+        "Standard deviation",
+        "Product of all values"
+      ],
+      "ans": 1,
+      "exp": "SUM() returns the total sum of a numeric column."
+    },
+    {
+      "q": "GROUP BY is used to:",
+      "opts": [
+        "Sort rows",
+        "Group rows sharing values in one or more columns, typically with aggregates",
+        "Filter individual rows",
+        "Rename columns"
+      ],
+      "ans": 1,
+      "exp": "GROUP BY groups rows for aggregate summaries — often used with COUNT/SUM/MIN/MAX/AVG."
+    },
+    {
+      "q": "Why does SQL provide HAVING in addition to WHERE?",
+      "opts": [
+        "HAVING is faster",
+        "WHERE cannot use aggregates; HAVING filters after grouping",
+        "HAVING replaces GROUP BY",
+        "WHERE cannot filter text"
+      ],
+      "ans": 1,
+      "exp": "WHERE filters rows before grouping; HAVING filters after GROUP BY using aggregates."
+    },
+    {
+      "q": "Which query lists countries having more than 5 customers?",
+      "opts": [
+        "SELECT Country FROM Customers WHERE COUNT(CustomerID) > 5;",
+        "SELECT COUNT(CustomerID), Country FROM Customers GROUP BY Country HAVING COUNT(CustomerID) > 5;",
+        "SELECT COUNT(*) FROM Customers HAVING Country > 5;",
+        "SELECT Country FROM Customers GROUP BY COUNT(CustomerID) > 5;"
+      ],
+      "ans": 1,
+      "exp": "Aggregate filtering needs GROUP BY + HAVING; COUNT in WHERE is invalid."
+    },
+    {
+      "q": "Evaluation priority: which is given priority when both appear in a query?",
+      "opts": [
+        "HAVING before WHERE",
+        "WHERE before HAVING",
+        "They run simultaneously",
+        "Depends on the index"
+      ],
+      "ans": 1,
+      "exp": "WHERE filters individual rows first; then GROUP BY groups; then HAVING filters groups."
+    },
+    {
+      "q": "Which JOIN returns only rows with matching values in BOTH tables?",
+      "opts": [
+        "LEFT JOIN",
+        "RIGHT JOIN",
+        "INNER JOIN",
+        "FULL OUTER JOIN"
+      ],
+      "ans": 2,
+      "exp": "INNER JOIN keeps only matched rows."
+    },
+    {
+      "q": "In a LEFT JOIN of Customers (left) and Orders (right), a customer with no orders appears:",
+      "opts": [
+        "Not at all",
+        "With NULLs in the Orders columns",
+        "Once per existing order of others",
+        "With zeros in Orders columns"
+      ],
+      "ans": 1,
+      "exp": "LEFT JOIN retains all left-table rows; unmatched right columns are NULL."
+    },
+    {
+      "q": "A RIGHT JOIN returns:",
+      "opts": [
+        "All rows from the left table",
+        "All rows from the right table and matching rows from the left",
+        "Only intersection",
+        "Union of the two tables"
+      ],
+      "ans": 1,
+      "exp": "RIGHT JOIN keeps every right-table row, with NULLs for unmatched left columns."
+    },
+    {
+      "q": "A FULL OUTER JOIN returns:",
+      "opts": [
+        "Only matching rows",
+        "All rows from either table, with NULLs where no match exists",
+        "Only unmatched rows",
+        "A cross product"
+      ],
+      "ans": 1,
+      "exp": "FULL OUTER JOIN combines LEFT and RIGHT — keeps all rows of both tables with NULLs."
+    },
+    {
+      "q": "Which conditions must SELECTs meet to be combined with UNION?",
+      "opts": [
+        "Same number of columns, similar data types, same column order",
+        "Same table names",
+        "Same WHERE clauses",
+        "Identical indexes"
+      ],
+      "ans": 0,
+      "exp": "UNION requires equal column count, compatible data types, same order."
+    },
+    {
+      "q": "Difference between UNION and UNION ALL:",
+      "opts": [
+        "UNION ALL removes duplicates",
+        "UNION selects only distinct values by default; UNION ALL allows duplicates",
+        "UNION is faster than UNION ALL",
+        "No difference"
+      ],
+      "ans": 1,
+      "exp": "UNION deduplicates the combined result; UNION ALL preserves duplicates, so it is typically faster."
+    },
+    {
+      "q": "Which are equivalent ways (across DB systems) to fetch the first 3 rows?",
+      "opts": [
+        "SELECT TOP 3 …, LIMIT 3, FETCH FIRST 3 ROWS ONLY, ROWNUM <= 3",
+        "Only LIMIT 3",
+        "Only SELECT TOP 3",
+        "HEAD 3 and TAIL 3"
+      ],
+      "ans": 0,
+      "exp": "SQL Server uses TOP, MySQL uses LIMIT, standard SQL/DB2/Oracle 12c+ use FETCH FIRST, older Oracle uses ROWNUM."
+    },
+    {
+      "q": "'ALTER TABLE Customers ADD Email varchar(255);' does what?",
+      "opts": [
+        "Creates a new table",
+        "Adds a new column Email to the existing Customers table",
+        "Renames a column",
+        "Inserts a row"
+      ],
+      "ans": 1,
+      "exp": "ALTER TABLE ADD adds a column; DROP COLUMN removes; MODIFY/ALTER COLUMN changes datatype."
+    },
+    {
+      "q": "'ALTER TABLE Customers DROP COLUMN Email;' does what?",
+      "opts": [
+        "Deletes the whole table",
+        "Deletes the Email column from the table",
+        "Removes rows where Email is NULL",
+        "Renames Email"
+      ],
+      "ans": 1,
+      "exp": "DROP COLUMN removes an entire column and its data."
+    },
+    {
+      "q": "'ALTER TABLE Persons ALTER COLUMN DateOfBirth year;' does what?",
+      "opts": [
+        "Adds a new column",
+        "Deletes the column",
+        "Modifies the column's datatype",
+        "Renames the column"
+      ],
+      "ans": 2,
+      "exp": "ALTER/MODIFY COLUMN changes a column's data type."
+    },
+    {
+      "q": "CREATE DATABASE is used to:",
+      "opts": [
+        "Create a table",
+        "Create a new SQL database",
+        "Grant permissions",
+        "Truncate a database"
+      ],
+      "ans": 1,
+      "exp": "CREATE DATABASE creates a new database (DDL)."
+    },
+    {
+      "q": "DROP DATABASE:",
+      "opts": [
+        "Drops a table",
+        "Deletes an existing SQL database",
+        "Truncates rows",
+        "Rolls back"
+      ],
+      "ans": 1,
+      "exp": "DROP DATABASE removes an existing database entirely."
+    },
+    {
+      "q": "DROP TABLE:",
+      "opts": [
+        "Removes all rows but keeps the table",
+        "Removes the table (structure and data)",
+        "Rolls back",
+        "Renames the table"
+      ],
+      "ans": 1,
+      "exp": "DROP TABLE removes the table entirely."
+    },
+    {
+      "q": "TRUNCATE TABLE:",
+      "opts": [
+        "Deletes the table itself",
+        "Deletes all rows but preserves the table structure",
+        "Deletes rows matching a condition",
+        "Renames the table"
+      ],
+      "ans": 1,
+      "exp": "TRUNCATE removes all rows and reclaims space; table structure remains."
+    },
+    {
+      "q": "Which TCL command permanently saves the current transaction's changes?",
+      "opts": [
+        "ROLLBACK",
+        "COMMIT",
+        "SAVEPOINT",
+        "MERGE"
+      ],
+      "ans": 1,
+      "exp": "COMMIT commits a transaction, persisting its changes."
+    },
+    {
+      "q": "Which TCL command undoes a transaction on error?",
+      "opts": [
+        "ROLLBACK",
+        "COMMIT",
+        "SAVEPOINT",
+        "GRANT"
+      ],
+      "ans": 0,
+      "exp": "ROLLBACK reverts the transaction's changes on error."
+    },
+    {
+      "q": "Which TCL command creates an intermediate point to roll back to?",
+      "opts": [
+        "COMMIT",
+        "ROLLBACK",
+        "SAVEPOINT",
+        "CHECKPOINT"
+      ],
+      "ans": 2,
+      "exp": "SAVEPOINT marks a point in a transaction; ROLLBACK TO savepoint undoes work after it."
+    },
+    {
+      "q": "GRANT and REVOKE are used to:",
+      "opts": [
+        "Modify data",
+        "Give and withdraw access privileges to database users",
+        "Create tables",
+        "Commit transactions"
+      ],
+      "ans": 1,
+      "exp": "GRANT provides privileges; REVOKE withdraws them (both DCL)."
+    }
+  ]
+}

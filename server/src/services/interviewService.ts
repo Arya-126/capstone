@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prisma';
 import Groq from 'groq-sdk';
 import { redis } from '../lib/redis';
+import { checkPipelineGates } from './pipelineService';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -110,7 +111,9 @@ export const getCategoryTopics = async (slug: string, userId: string) => {
         orderBy: { sortOrder: 'asc' },
         include: {
           _count: {
-            select: { questions: true },
+            // only count valid questions — a topic with 15 rows but 10 flagged
+            // should surface as "5 questions" to the user, not "15"
+            select: { questions: { where: { isValid: true } } },
           },
           theory: {
             select: { id: true }, // just to check if it exists
@@ -147,7 +150,7 @@ export const getCategoryTopics = async (slug: string, userId: string) => {
 
 export const getTopicQuestions = async (topicId: string, limit: number = 10) => {
   const allQuestions = await prisma.interviewQuestion.findMany({
-    where: { topicId },
+    where: { topicId, isValid: true },
     select: {
       id: true,
       question: true,
@@ -259,6 +262,32 @@ export const submitInterviewQuiz = async (
         lastIntegrity: (integrity ?? undefined) as any,
       },
     });
+  }
+
+  // Pipeline gate: aptitude quiz. Look up the topic's category slug so gates
+  // that target "quantitative-aptitude" (etc.) match. Non-fatal on failure.
+  try {
+    const topic = await prisma.interviewTopic.findUnique({
+      where: { id: topicId },
+      include: { category: true },
+    });
+    if (topic) {
+      // Map category slug → diagnostic subtopic key (Quantitative / Logical / Verbal)
+      const subtopicByCategory: Record<string, string> = {
+        'quantitative-aptitude': 'Quantitative',
+        'logical-reasoning': 'Logical',
+        'verbal-ability': 'Verbal',
+      };
+      await checkPipelineGates(userId, {
+        type: 'quiz-submitted',
+        source: 'interview-category',
+        categorySlug: topic.category.slug,
+        subtopic: subtopicByCategory[topic.category.slug],
+        scorePct: percentage,
+      });
+    }
+  } catch (e) {
+    console.warn('Pipeline gate check failed (non-fatal):', e);
   }
 
   return {
