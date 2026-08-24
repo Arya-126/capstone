@@ -18,6 +18,8 @@ const SECTIONS: NavSection[] = [
       { icon: '🏠', label: 'Home', page: 'interview-home' },
       { icon: '🚀', label: 'Placement Drive', page: 'placement-drive' },
       { icon: '📊', label: 'Prep Analytics', page: 'prep-tracker' },
+      { icon: '📝', label: 'Reports', page: 'reports' },
+      { icon: '🎮', label: 'Prep Games', page: 'prep-games' },
       { icon: '🎯', label: 'Active Quests', page: 'quests-hub' },
       { icon: '🧮', label: 'Aptitude', page: 'interview-hub' },
       { icon: '💻', label: 'Coding Tracks', page: 'coding-tracks' },

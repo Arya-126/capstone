@@ -6,6 +6,7 @@ import { diagnoseInterview } from './diagnosisService';
 import { awardXp, calculateInterviewXp } from './xpService';
 import { checkAchievements } from './achievementService';
 import { checkPipelineGates } from './pipelineService';
+import { generateReport } from './reportService';
 
 // Conversational mock interview backed by AiInterview/AiInterviewTurn.
 // Prompts live in server/ai/prompts/*.md so they can be edited without
@@ -374,6 +375,18 @@ export async function finishInterview(interviewId: string, userId: string) {
     console.warn('Interview XP/achievement award failed (non-fatal):', err);
   }
 
+  // Comprehensive report — non-fatal
+  try {
+    await generateReport({
+      userId,
+      sourceType: 'ai-interview',
+      sourceId: interviewId,
+      overallScore: overall ?? 0,
+    });
+  } catch (err) {
+    console.warn('Interview report generation failed (non-fatal):', err);
+  }
+
   try {
     await diagnoseInterview(interviewId, userId);
   } catch (err) {
@@ -494,6 +507,18 @@ export async function scoreCodingInterview(
     });
   } catch (err) {
     console.warn('Coding interview XP/achievement award failed (non-fatal):', err);
+  }
+
+  // Coding-round comprehensive report — non-fatal
+  try {
+    await generateReport({
+      userId,
+      sourceType: 'coding-round',
+      sourceId: interviewId,
+      overallScore: overall ?? 0,
+    });
+  } catch (err) {
+    console.warn('Coding report generation failed (non-fatal):', err);
   }
 
   try {

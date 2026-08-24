@@ -25,6 +25,8 @@ import placementDriveRoutes from './routes/placementDrive';
 import prepTrackerRoutes from './routes/prepTracker';
 import diagnosticRoutes from './routes/diagnostic';
 import pipelineRoutes from './routes/pipeline';
+import reportsRoutes from './routes/reports';
+import gamesContentRoutes from './routes/gamesContent';
 import { authMiddleware } from './middleware/auth';
 
 const app: Express = express();
@@ -62,6 +64,10 @@ app.use('/prep-tracker', prepTrackerRoutes);
 app.use('/diagnostic', diagnosticRoutes);
 // /pipeline/current, /pipeline/create, /pipeline/:id/skip-stage/:stageId
 app.use('/pipeline', pipelineRoutes);
+// /reports/:id, /reports?limit=, /reports/synopsis/:subject/:concept
+app.use('/reports', reportsRoutes);
+// /games-content/star-roleplay/random, /games-content/time-rush/random
+app.use('/games-content', gamesContentRoutes);
 
 // Root route
 app.get('/', (req, res) => {

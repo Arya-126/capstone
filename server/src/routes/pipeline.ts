@@ -1,7 +1,7 @@
 import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
-import { createPipeline, getCurrentPipeline } from '../services/pipelineService';
+import { createPipeline, getCurrentPipeline, injectStagesFromReport } from '../services/pipelineService';
 
 const router = Router();
 
@@ -72,5 +72,27 @@ router.post('/:id/skip-stage/:stageId', authMiddleware, async (req: AuthRequest,
     res.status(500).json({ error: error.message || 'Failed to skip stage' });
   }
 });
+
+// POST /pipeline/current/inject-from-report/:reportId — appends stages for
+// each weak concept in the report to the user's ACTIVE pipeline. Idempotent
+// per concept (dedup by subject+concept).
+router.post(
+  '/current/inject-from-report/:reportId',
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const result = await injectStagesFromReport(req.userId!, req.params.reportId);
+      if (!result.pipelineId) {
+        return res.status(404).json({
+          error: 'No active pipeline — create one first from the pipeline page.',
+        });
+      }
+      const pipeline = await getCurrentPipeline(req.userId!);
+      res.json({ ...result, pipeline });
+    } catch (error: any) {
+      res.status(400).json({ error: error.message || 'Failed to inject stages' });
+    }
+  },
+);
 
 export default router;

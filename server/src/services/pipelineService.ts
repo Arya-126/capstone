@@ -323,6 +323,130 @@ export async function getCurrentPipeline(userId: string) {
   });
 }
 
+// ---- inject stages from a TestReport ----
+//
+// Called by POST /pipeline/current/inject-from-report/:reportId. Reads the
+// report's weakConcepts, pulls cached ConceptSynopsis for each, and appends
+// one PipelineStage per weak concept to the ACTIVE pipeline. Skips concepts
+// that already have a stage targeting them (dedup by pillar+subtopic).
+// Returns { added, skipped, alreadyDoneCount }.
+
+const SUBJECT_TO_PILLAR: Record<string, 'aptitude' | 'coreCS' | 'coding' | 'comm'> = {
+  Quantitative: 'aptitude',
+  Logical: 'aptitude',
+  Verbal: 'aptitude',
+  Aptitude: 'aptitude',
+  CN: 'coreCS',
+  OS: 'coreCS',
+  DBMS: 'coreCS',
+  SQL: 'coreCS',
+  CS: 'coreCS',
+  DSA: 'coding',
+  HR: 'comm',
+};
+
+const APTITUDE_SUB_TO_CATEGORY: Record<string, string> = {
+  Quantitative: 'quantitative-aptitude',
+  Logical: 'logical-reasoning',
+  Verbal: 'verbal-ability',
+};
+
+export async function injectStagesFromReport(userId: string, reportId: string): Promise<{
+  added: number;
+  skipped: number;
+  pipelineId: string | null;
+}> {
+  const [pipeline, report] = await Promise.all([
+    prisma.learningPipeline.findFirst({
+      where: { userId, status: 'ACTIVE' },
+      include: { stages: { orderBy: { order: 'asc' } } },
+    }),
+    prisma.testReport.findUnique({ where: { id: reportId } }),
+  ]);
+  if (!pipeline) return { added: 0, skipped: 0, pipelineId: null };
+  if (!report || report.userId !== userId) throw new Error('Report not found');
+
+  const weak = (report.weakConcepts as any[]) || [];
+  if (weak.length === 0) return { added: 0, skipped: 0, pipelineId: pipeline.id };
+
+  let orderCursor = pipeline.stages.length > 0
+    ? Math.max(...pipeline.stages.map((s) => s.order))
+    : 0;
+  let added = 0;
+  let skipped = 0;
+
+  // The user's current active stage — the very first unlocked-but-incomplete one
+  const hasActiveCurrent = pipeline.stages.some((s) => s.isUnlocked && !s.isCompleted);
+
+  for (const w of weak) {
+    const subject: string = String(w.subject || '').trim();
+    const concept: string = String(w.concept || '').trim();
+    if (!subject || !concept) { skipped++; continue; }
+
+    const pillar = SUBJECT_TO_PILLAR[subject] || 'coreCS';
+
+    // Dedup: skip if an existing stage already targets the same subject+concept
+    const dup = pipeline.stages.find((s) => {
+      const m = (s.gateMeta as any) || {};
+      if (s.pillar !== pillar) return false;
+      if (m.subject && m.subject === subject) return true;
+      if (m.subtopic && m.subtopic === subject) return true;
+      if (m.synopsisConcept && m.synopsisConcept === concept) return true;
+      return false;
+    });
+    if (dup) { skipped++; continue; }
+
+    // Pull the cached synopsis (if any) to enrich the stage description
+    const syn = await prisma.conceptSynopsis.findUnique({
+      where: { subject_concept: { subject, concept } },
+    });
+    const bullet = (syn?.bulletKeys?.[0] || '').slice(0, 140);
+
+    // Gate: quiz on the appropriate source
+    let gateMeta: any = { subject, concept, minScore: 70, questionCount: 10, synopsisConcept: concept };
+    if (pillar === 'coreCS') {
+      gateMeta = { ...gateMeta, source: 'core-subject', subject: subject === 'CS' ? 'CN' : subject };
+    } else if (pillar === 'aptitude') {
+      gateMeta = { ...gateMeta, source: 'interview-category', subtopic: subject, categorySlug: APTITUDE_SUB_TO_CATEGORY[subject] };
+    } else if (pillar === 'coding') {
+      // coding weakness → 2 solved problems, topic-slug agnostic
+      gateMeta = { minSolved: 2, subject: 'DSA', concept, synopsisConcept: concept };
+    } else if (pillar === 'comm') {
+      // HR weakness → complete an HR mock scoring ≥ 60
+      gateMeta = { roundType: 'hr', minOverallScore: 60, synopsisConcept: concept };
+    }
+    if (bullet) gateMeta.synopsisBullet = bullet;
+
+    const gateType =
+      pillar === 'coding' ? 'coding-solve' :
+      pillar === 'comm'   ? 'interview' :
+      'quiz';
+
+    orderCursor++;
+    const isFirstOfBatch = added === 0 && !hasActiveCurrent;
+    await prisma.pipelineStage.create({
+      data: {
+        pipelineId: pipeline.id,
+        order: orderCursor,
+        pillar,
+        level: 3, // "from report" stages target level 3 (intermediate)
+        title: `Reinforce ${concept} (${subject})`,
+        description: bullet
+          ? `Focus on ${concept}. ${bullet}`
+          : `Address the gap in ${concept} you saw in your report.`,
+        gateType,
+        gateMeta,
+        // If the user has no current unlocked stage, unlock the first injected
+        // one immediately so they're not stuck
+        isUnlocked: isFirstOfBatch,
+      },
+    });
+    added++;
+  }
+
+  return { added, skipped, pipelineId: pipeline.id };
+}
+
 // ---- gate checker ----
 
 // Typed event payloads that gate checks consume. Adding a new gateType =

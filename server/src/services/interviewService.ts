@@ -2,6 +2,7 @@ import { prisma } from '../lib/prisma';
 import Groq from 'groq-sdk';
 import { redis } from '../lib/redis';
 import { checkPipelineGates } from './pipelineService';
+import { generateReport } from './reportService';
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -290,6 +291,24 @@ export const submitInterviewQuiz = async (
     console.warn('Pipeline gate check failed (non-fatal):', e);
   }
 
+  // Generate comprehensive report (aptitude quiz flavor). Non-fatal.
+  let reportId: string | null = null;
+  try {
+    const rep = await generateReport({
+      userId,
+      sourceType: 'aptitude-quiz',
+      sourceId: `apt_${topicId}_${Date.now()}`,
+      overallScore: percentage,
+      aptitudeAnswers: answers.map((a) => ({
+        questionId: a.questionId,
+        chosenIndex: a.chosenIndex,
+      })),
+    });
+    reportId = rep.id;
+  } catch (e) {
+    console.warn('Aptitude report generation failed (non-fatal):', e);
+  }
+
   return {
     score,
     maxScore,
@@ -297,6 +316,7 @@ export const submitInterviewQuiz = async (
     xpEarned,
     results,
     integrity,
+    reportId,
   };
 };
 

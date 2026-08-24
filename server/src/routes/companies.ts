@@ -118,7 +118,7 @@ router.get('/:slug/prep', authMiddleware, async (req: AuthRequest, res: Response
   }
 });
 
-// GET /companies/:slug/detail — bundles everything the tabbed CompanyDetail
+// GET /companies/:slug/detail — bundles everything for CompanyDetail
 // page needs: readiness (Overview tab), company-tagged coding problems
 // (Coding tab), CompanyQuestion rows (Technical tab), company-tagged HR
 // prompts (HR tab). Existing /companies/:slug/prep is kept for the Overview
@@ -156,7 +156,7 @@ router.get('/:slug/detail', authMiddleware, async (req: AuthRequest, res: Respon
       }),
     ]);
 
-    const solvedMap = new Map(solved.map((s) => [s.problemId, s.bestScore]));
+    const solvedMap = new Map(solved.map((s: { problemId: string; bestScore: number | null }) => [s.problemId, s.bestScore]));
 
     // Group technical by subject for the tab UI.
     const techBySubject: Record<string, typeof technical> = {};
@@ -177,7 +177,7 @@ router.get('/:slug/detail', authMiddleware, async (req: AuthRequest, res: Respon
         total: technical.length,
         bySubject: techBySubject,
       },
-      coding: coding.map((p) => ({
+      coding: coding.map((p: any) => ({
         ...p,
         solved: solvedMap.has(p.id),
         bestScore: solvedMap.get(p.id) ?? null,

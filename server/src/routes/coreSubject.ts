@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authMiddleware, AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { checkPipelineGates } from '../services/pipelineService';
+import { generateReport } from '../services/reportService';
 
 const router = Router();
 
@@ -102,12 +103,29 @@ router.post('/submit-quiz', authMiddleware, async (req: AuthRequest, res: Respon
       }
     }
 
+    // Generate a comprehensive report — non-fatal, best-effort. reportId
+    // (if generated) lets the client navigate to /reports/:id.
+    let reportId: string | null = null;
+    try {
+      const rep = await generateReport({
+        userId,
+        sourceType: 'core-cs-quiz',
+        sourceId: `csq_${Date.now()}`,   // no attempt table for this flow; synthetic id is fine
+        overallScore: percentage,
+        coreCsAnswers: answers,
+      });
+      reportId = rep.id;
+    } catch (e) {
+      console.warn('Core-CS report generation failed (non-fatal):', e);
+    }
+
     res.json({
       score: correctCount,
       total: answers.length,
       percentage,
       xpEarned,
       details,
+      reportId,
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message || 'Failed to submit quiz' });
