@@ -50,6 +50,16 @@ import { DiagnosticIntro } from './pages/DiagnosticIntro';
 import { DiagnosticTest, DiagnosticResultPayload } from './pages/DiagnosticTest';
 import { DiagnosticResult } from './pages/DiagnosticResult';
 import { PipelinePage } from './pages/PipelinePage';
+import { TestReport } from './pages/TestReport';
+import { ReportsInbox } from './pages/ReportsInbox';
+import { PrepGamesHub } from './pages/PrepGamesHub';
+import { ComplexitySortGame } from './pages/games/ComplexitySort';
+import { TimeRushGame } from './pages/games/TimeRush';
+import { StarRoleplayGame } from './pages/games/StarRoleplayGame';
+import { BugHuntGame } from './pages/games/BugHunt';
+import { DryRunGame } from './pages/games/DryRun';
+import { SqlPuzzleGame } from './pages/games/SqlPuzzle';
+import { DiagramLabelerGame } from './pages/games/DiagramLabeler';
 
 interface User {
   id: string;
@@ -95,6 +105,9 @@ const App: React.FC = () => {
   // payload is stashed so DiagnosticResult can render without another API call.
   const [diagnosticAttemptId, setDiagnosticAttemptId] = useState<string | null>(null);
   const [diagnosticResult, setDiagnosticResult] = useState<DiagnosticResultPayload | null>(null);
+  // Comprehensive test report — set when a quiz/interview finishes and
+  // its response includes a reportId; navigating to 'test-report' opens it.
+  const [reportId, setReportId] = useState<string | null>(null);
 
   useEffect(() => {
     if (auth.token) {
@@ -487,6 +500,48 @@ const App: React.FC = () => {
             }}
             onNoDiagnostic={() => setCurrentPage('diagnostic-intro')}
           />
+        )}
+
+        {currentPage === 'test-report' && auth.user && reportId && (
+          <TestReport
+            reportId={reportId}
+            onBack={() => { setReportId(null); setCurrentPage('reports'); }}
+            onNavigate={(page, ctx) => {
+              if (ctx?.categorySlug) setSelectedInterviewCategorySlug(ctx.categorySlug);
+              setCurrentPage(page);
+            }}
+          />
+        )}
+
+        {currentPage === 'reports' && auth.user && (
+          <ReportsInbox
+            onOpen={(id) => { setReportId(id); setCurrentPage('test-report'); }}
+          />
+        )}
+
+        {currentPage === 'prep-games' && auth.user && (
+          <PrepGamesHub onOpen={(k) => setCurrentPage(`game-${k}`)} />
+        )}
+        {currentPage === 'game-complexity-sort' && auth.user && (
+          <ComplexitySortGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-time-rush' && auth.user && (
+          <TimeRushGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-star-roleplay' && auth.user && (
+          <StarRoleplayGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-bug-hunt' && auth.user && (
+          <BugHuntGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-dry-run' && auth.user && (
+          <DryRunGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-sql-puzzle' && auth.user && (
+          <SqlPuzzleGame onBack={() => setCurrentPage('prep-games')} />
+        )}
+        {currentPage === 'game-diagram-labeler' && auth.user && (
+          <DiagramLabelerGame onBack={() => setCurrentPage('prep-games')} />
         )}
 
         {/* DOMAIN HUB ROUTES */}

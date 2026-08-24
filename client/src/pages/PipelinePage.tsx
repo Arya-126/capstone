@@ -260,6 +260,11 @@ export const PipelinePage: React.FC<{
             </div>
           </div>
           <p className="text-sm text-gray-600 mb-3">{current.description}</p>
+          {current.gateMeta?.synopsisBullet && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-900 mb-3">
+              💡 <b>Key takeaway:</b> {current.gateMeta.synopsisBullet}
+            </div>
+          )}
           <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs font-bold text-slate-700 mb-4">
             🎯 Gate: {gateReqText(current)}
           </div>
@@ -314,6 +319,11 @@ export const PipelinePage: React.FC<{
                       Stage {s.order} · {s.title}
                     </div>
                     <div className="text-xs text-amber-700">{gateReqText(s)}</div>
+                    {s.gateMeta?.synopsisBullet && (
+                      <div className="text-[11px] text-amber-800 mt-1 truncate italic">
+                        💡 {s.gateMeta.synopsisBullet}
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={() => onNavigate(cta.targetPage, cta.extra)}

@@ -39,6 +39,7 @@ model User {
   skillProfile     UserSkillProfile?
   diagnosticAttempts DiagnosticAttempt[]
   learningPipelines LearningPipeline[]
+  testReports      TestReport[]
 }
 
 enum Role {
@@ -862,4 +863,59 @@ model PipelineStage {
 
   @@unique([pipelineId, order])
   @@index([pipelineId, isCompleted])
+}
+
+// ===== COMPREHENSIVE TEST REPORTS =====
+// See plan-comprehensive-reports.md. Reports snapshot one attempt (aptitude,
+// core-CS, AI interview, coding, or placement drive) with per-mistake
+// analysis + weak-concept tagging. ConceptSynopsis caches an LLM-generated
+// explanation per (subject, concept) — shared across users and reports.
+
+model TestReport {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceType     String   // "core-cs-quiz" | "aptitude-quiz" | "ai-interview" | "coding-round" | "placement-drive"
+  sourceId       String   // FK-like id into the underlying attempt row
+  overallScore   Float
+  perQuestion    Json     // [{ questionId, prompt, userAnswer, correctAnswer, isCorrect, explanation, conceptTag }]
+  weakConcepts   Json     // [{ concept, subject, missCount, missedQuestionIds }]
+  strongConcepts Json     // [{ concept, subject, correctCount }]
+  createdAt      DateTime @default(now())
+
+  @@index([userId, sourceType])
+  @@index([sourceType, sourceId])
+}
+
+model ConceptSynopsis {
+  id               String   @id @default(uuid())
+  subject          String   // "OS" | "CN" | "DBMS" | "SQL" | "DSA" | "HR" | "Aptitude"
+  concept          String   // "Virtual Memory" | "TCP 3-way handshake" | "Normalization 3NF"
+  synopsis         String   // 4-8 sentence spoken-friendly explanation
+  bulletKeys       String[] // 3-5 crisp bullet points
+  commonMistakes   String?  // one sentence
+  recommendedGames Json     // [{ gameType, topicSlug?, reason }]
+  generatedBy      String   @default("groq")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([subject, concept])
+}
+
+// ===== PREP GAMES (Sprint 2 of plan-comprehensive-reports.md) =====
+// Cached game content — STAR Roleplay uses this (LLM-generated 4-answer sets
+// per HrQuestion). Complexity Sort + Time Rush derive from static data or
+// existing tables and don't need rows here.
+model GameContent {
+  id         String   @id @default(uuid())
+  gameType   String   // "STAR_ROLEPLAY" | "BUG_HUNT" | "DRY_RUN" | ...
+  subject    String   // "HR" | "DSA" | ...
+  refId      String?  // link back to source (e.g. HrQuestion.id for STAR Roleplay)
+  payload    Json     // shape depends on gameType — see game pages
+  difficulty String   @default("medium")
+  source     String   @default("llm-groq") // "seed" | "llm-groq" | "llm-gemini"
+  createdAt  DateTime @default(now())
+
+  @@index([gameType, subject])
+  @@index([gameType, refId])
 }

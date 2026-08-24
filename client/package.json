@@ -14,7 +14,8 @@
     "@monaco-editor/react": "^4.7.0",
     "katex": "^0.17.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "sql.js": "^1.14.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
